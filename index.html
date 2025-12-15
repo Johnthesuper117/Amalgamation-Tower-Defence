@@ -452,7 +452,7 @@ const ENEMIES = {
     swarm: { hp: 5, speed: 5, color: "#ff00ff", reward: 2, radius: 5, name: "Nano-Swarm", shape: "triangle_small", resistance: "none" },
     fast: { hp: 15, speed: 3.5, color: "#00f3ff", reward: 8, radius: 7, name: "Glitch-Runner", shape: "arrow", resistance: "none" },
     tank: { hp: 120, speed: 1, color: "#6e7681", reward: 15, radius: 14, name: "Heavy Mech", shape: "square", resistance: "physical" }, 
-    shield: { hp: 300, speed: 0.8, color: "#DAA520", reward: 30, radius: 16, name: "Armored Beetle", shape: "pentagon", resistance: "none" },
+    // Vectoid Inspired
     diamond: { hp: 500, speed: 1.2, color: "#00ffff", reward: 60, radius: 14, name: "Diamond Construct", shape: "diamond_solid", resistance: "physical" },
     dark_matter: { hp: 400, speed: 3.0, color: "#111111", reward: 70, radius: 12, name: "Dark Matter Wisp", shape: "star_dark", resistance: "energy" },
     elite: { hp: 600, speed: 1.5, color: "#DC143C", reward: 50, radius: 12, name: "Praetorian", shape: "diamond", resistance: "none" },
@@ -462,7 +462,7 @@ const ENEMIES = {
     boss: { hp: 3000, speed: 0.6, color: "#bd00ff", reward: 300, radius: 25, name: "Void Titan", shape: "skull", resistance: "none" }, 
     titan_mk2: { hp: 10000, speed: 0.4, color: "#fff", reward: 1000, radius: 35, name: "Omega Titan", shape: "omega", resistance: "all" },
     // Flying Enemy
-    flyer: { hp: 80, speed: 3.0, color: "#FF4500", reward: 20, radius: 9, name: "Void-Wing", shape: "wing", resistance: "none", fly: true }
+    flyer: { hp: 80, speed: 3.0, color: "#FF4500", reward: 20, radius: 9, name: "Wrinkling", shape: "wing", resistance: "none", fly: true }
 };
 
 // Tower Definitions
@@ -692,6 +692,10 @@ class Tower {
             if (this.priority === 'closest') return Math.hypot(a.x - this.x, a.y - this.y) - Math.hypot(b.x - this.x, b.y - this.y);
             if (this.priority === 'farthest') return Math.hypot(b.x - this.x, b.y - this.y) - Math.hypot(a.x - this.x, a.y - this.y);
             if (this.priority === 'strongest') return b.hp - a.hp;
+            if (this.priority === 'flying') {
+                if (a.fly !== b.fly) return b.fly ? 1 : -1;
+                return b.distanceTravelled - a.distanceTravelled;
+            }
             return b.distanceTravelled - a.distanceTravelled;
         })[0];
     }
@@ -1010,6 +1014,7 @@ function cyclePriority() {
     else if (p === 'last') selectedTower.priority = 'closest';
     else if (p === 'closest') selectedTower.priority = 'farthest';
     else if (p === 'farthest') selectedTower.priority = 'strongest';
+    else if (p === 'strongest') selectedTower.priority = 'flying';
     else selectedTower.priority = 'first';
     const btn = document.getElementById('priority-btn');
     btn.innerText = "Target: " + selectedTower.priority.charAt(0).toUpperCase() + selectedTower.priority.slice(1);
@@ -1279,6 +1284,32 @@ function drawGame() {
         ctx.lineWidth = GRID_SIZE; ctx.strokeStyle = C_PATH_BORDER; ctx.stroke();
         ctx.lineWidth = GRID_SIZE - 4; ctx.strokeStyle = C_PATH; ctx.stroke();
         ctx.lineWidth = 2; ctx.setLineDash([10, 20]); ctx.strokeStyle = "rgba(0, 243, 255, 0.1)"; ctx.stroke(); ctx.setLineDash([]);
+
+        // Draw Wormhole for Wrinklings
+        if (enemies.some(e => e.fly)) {
+            const start = pathPoints[0];
+            const end = pathPoints[pathPoints.length - 1];
+            ctx.save();
+            ctx.beginPath();
+            ctx.moveTo(start.x, start.y);
+            ctx.lineTo(end.x, end.y);
+            
+            // Visuals
+            ctx.shadowBlur = 15;
+            ctx.shadowColor = "#9370DB"; // MediumPurple glow
+            ctx.lineWidth = 14;
+            ctx.strokeStyle = "rgba(75, 0, 130, 0.2)"; // Faint indigo tunnel
+            ctx.stroke();
+            
+            ctx.shadowBlur = 0;
+            ctx.lineWidth = 3;
+            ctx.strokeStyle = "rgba(147, 112, 219, 0.8)"; // Moving texture
+            ctx.setLineDash([15, 15]);
+            ctx.lineDashOffset = -gameState.frames * 3; // Animation
+            ctx.stroke();
+            ctx.setLineDash([]);
+            ctx.restore();
+        }
     }
 
     mines.forEach(m => {
