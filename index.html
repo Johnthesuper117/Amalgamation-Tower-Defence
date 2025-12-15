@@ -287,63 +287,6 @@
         h1 { margin: 0 0 20px 0; text-shadow: 0 0 10px var(--accent-magic); font-size: 32px; }
         .modal-buttons { display: flex; gap: 20px; margin-top: 20px; }
 
-        /* Shop Dropdown Styles (Restored) */
-        #shop-container {
-            position: absolute;
-            top: 70px;
-            right: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-            pointer-events: none;
-            z-index: 150;
-        }
-
-        #shop-toggle-btn {
-            pointer-events: auto;
-            background: linear-gradient(180deg, #21262d, #161b22);
-            border: 1px solid #30363d;
-            color: var(--accent-tech);
-            padding: 10px 20px;
-            border-radius: 4px;
-            font-weight: bold;
-            cursor: pointer;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.5);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        #shop-toggle-btn:hover {
-            border-color: var(--accent-tech);
-            text-shadow: 0 0 5px var(--accent-tech);
-            background: #30363d;
-        }
-
-        #shop-dropdown {
-            pointer-events: auto;
-            margin-top: 5px;
-            width: 240px;
-            background: rgba(22, 27, 34, 0.98);
-            border: 1px solid #30363d;
-            border-radius: 8px;
-            padding: 8px;
-            backdrop-filter: blur(10px);
-            display: none; /* Hidden by default */
-            flex-direction: column;
-            gap: 6px;
-            max-height: 70vh;
-            overflow-y: auto;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
-        }
-        
-        #shop-dropdown.open {
-            display: flex;
-        }
-
     </style>
 </head>
 <body>
@@ -814,11 +757,18 @@ class Tower {
         this.cooldown = 0; this.color = type.color; this.shape = type.shape;
         this.projectileSpeed = type.projectileSpeed || 0;
         this.path = 0; this.level = 0; this.angle = 0; this.buffSpeedMultiplier = 1.0;
+        this.buffDamageMultiplier = 1.0; this.buffRangeMultiplier = 1.0; this.buffCostMultiplier = 1.0;
         this.priority = 'first'; 
         this.currentTarget = null;
         this.totalDamage = 0; 
     }
-    update() { this.buffSpeedMultiplier = 1.0; if (this.cooldown > 0) this.cooldown--; }
+    update() { 
+        this.buffSpeedMultiplier = 1.0; 
+        this.buffDamageMultiplier = 1.0;
+        this.buffRangeMultiplier = 1.0;
+        this.buffCostMultiplier = 1.0;
+        if (this.cooldown > 0) this.cooldown--; 
+    }
     
     getTarget(candidates) {
         if (candidates.length === 0) return null;
@@ -845,38 +795,77 @@ class Tower {
         if (this.type === 'pylon') {
             let buffRange = this.range;
             if (this.path === 1 && this.level >= 1) buffRange += 50; if (this.path === 1 && this.level >= 3) buffRange = 2000;
-            towers.forEach(t => { if (t === this) return; if (Math.hypot(t.x - this.x, t.y - this.y) <= buffRange) { let boost = 1.1; if (this.path === 1 && this.level >= 2) boost = 1.25; if (this.path === 1 && this.level >= 5) boost = 2.0; t.buffSpeedMultiplier = Math.max(t.buffSpeedMultiplier, boost); } });
+            
+            // Apply buffs to neighbors
+            towers.forEach(t => { 
+                if (t === this) return; 
+                if (Math.hypot(t.x - this.x, t.y - this.y) <= buffRange) { 
+                    // Base: +20% Damage
+                    t.buffDamageMultiplier = Math.max(t.buffDamageMultiplier, 1.2);
+                    
+                    // Path 1 Lvl 2: +20% Range
+                    if (this.path === 1 && this.level >= 2) t.buffRangeMultiplier = Math.max(t.buffRangeMultiplier, 1.2);
+                    
+                    // Path 1 Lvl 4: 10% Discount
+                    if (this.path === 1 && this.level >= 4) t.buffCostMultiplier = Math.min(t.buffCostMultiplier, 0.9);
+                    
+                    // Path 1 Lvl 5: 25% Discount and +50% Damage
+                    if (this.path === 1 && this.level >= 5) {
+                        t.buffCostMultiplier = Math.min(t.buffCostMultiplier, 0.75);
+                        t.buffDamageMultiplier = Math.max(t.buffDamageMultiplier, 1.5);
+                    }
+                } 
+            });
             if (this.path === 2) { enemies.forEach(e => { if (Math.hypot(e.x - this.x, e.y - this.y) <= this.range) { if (this.level >= 1) e.slowTimer = 5; if (this.level >= 5) e.stunTimer = 1; } }); }
             return; 
         }
         if (this.type === 'miner') return;
+        
+        let effectiveRange = this.range * this.buffRangeMultiplier;
+        let effectiveDamage = this.damage * this.buffDamageMultiplier;
+
         if (this.type === 'fabricator') {
             if (this.cooldown <= 0) {
-                 mines.push({ x: this.x + (Math.random()-0.5)*40, y: this.y + (Math.random()-0.5)*40, damage: this.damage * (1 + this.level), radius: 20, life: 600, type: (this.path===2)?'rune':'tech', source: this });
-                 this.cooldown = cd;
+                 // Calculate spawn position on path
+                 let validPoints = [];
+                 for(let i=0; i<pathPoints.length-1; i++) {
+                     // Check if segment is close
+                     let p1 = pathPoints[i];
+                     let p2 = pathPoints[i+1];
+                     // Simplified: Check midpoints or sample points
+                     // Just check distance to p1, p2 for simplicity in this tick
+                     if (Math.hypot(p1.x - this.x, p1.y - this.y) < effectiveRange) validPoints.push(p1);
+                     if (Math.hypot(p2.x - this.x, p2.y - this.y) < effectiveRange) validPoints.push(p2);
+                 }
+                 
+                 if(validPoints.length > 0) {
+                     let p = validPoints[Math.floor(Math.random()*validPoints.length)];
+                     mines.push({ x: p.x + (Math.random()-0.5)*10, y: p.y + (Math.random()-0.5)*10, damage: effectiveDamage * (1 + this.level), radius: 20, life: 600, type: (this.path===2)?'rune':'tech', source: this });
+                     this.cooldown = cd;
+                 }
             }
             return;
         }
         if (this.type === 'vent') {
             let target = null; let minD = Infinity;
-            enemies.forEach(e => { let d = Math.hypot(e.x - this.x, e.y - this.y); if (d <= this.range && d < minD) { minD = d; target = e; } });
+            enemies.forEach(e => { let d = Math.hypot(e.x - this.x, e.y - this.y); if (d <= effectiveRange && d < minD) { minD = d; target = e; } });
             if (target) {
                 this.angle = Math.atan2(target.y - this.y, target.x - this.x);
                 if (this.cooldown <= 0) {
                     enemies.forEach(e => {
                         let d = Math.hypot(e.x - this.x, e.y - this.y);
-                        if (d <= this.range) {
+                        if (d <= effectiveRange) {
                             let angleToEnemy = Math.atan2(e.y - this.y, e.x - this.x);
                             let diff = angleToEnemy - this.angle;
                             while (diff < -Math.PI) diff += Math.PI * 2; while (diff > Math.PI) diff -= Math.PI * 2;
                             if (Math.abs(diff) < 0.5) {
-                                e.takeDamage(this.damage + (this.level * 2), this);
+                                e.takeDamage(effectiveDamage + (this.level * 2), this);
                                 if(this.path === 2 && this.level >= 1) e.slowTimer = 10;
                                 if(this.path === 1 && this.level >= 3) e.takeDamage(1, this);
                             }
                         }
                     });
-                    visualEffects.push(new VisualEffect('cone', this.x, this.y, { angle: this.angle, radius: this.range, color: this.path === 2 ? '#8A2BE2' : '#FF4500', life: 7 }));
+                    visualEffects.push(new VisualEffect('cone', this.x, this.y, { angle: this.angle, radius: effectiveRange, color: this.path === 2 ? '#8A2BE2' : '#FF4500', life: 7 }));
                     Sound.play(this.path===2?'shoot_magic':'shoot_tech');
                     this.cooldown = 6; 
                 }
@@ -885,7 +874,6 @@ class Tower {
         }
         
         let validTargets = [];
-        let effectiveRange = this.range;
         if (this.type === 'lance' && this.path === 1 && this.level >= 1) effectiveRange += 100;
         if (this.type === 'prism' && this.path === 1 && this.level >= 3) effectiveRange = 2000;
 
@@ -899,22 +887,22 @@ class Tower {
         if (target) {
             this.angle = Math.atan2(target.y - this.y, target.x - this.x);
             this.currentTarget = target; 
-            if (this.cooldown <= 0) { this.shoot(target); this.cooldown = cd; }
+            if (this.cooldown <= 0) { this.shoot(target, effectiveDamage); this.cooldown = cd; }
         }
     }
-    shoot(target) {
+    shoot(target, dmg) {
         Sound.play((this.type==='prism' || this.path===2) ? 'shoot_magic' : 'shoot_tech');
         if (this.type === 'prism') {
-            let dmg = this.damage * (1 + this.level);
-            if (this.path === 1 && this.level >= 1) dmg *= 2; if (this.path === 1 && this.level >= 5) dmg *= 5; 
-            target.takeDamage(dmg, this);
+            let d = dmg * (1 + this.level);
+            if (this.path === 1 && this.level >= 1) d *= 2; if (this.path === 1 && this.level >= 5) d *= 5; 
+            target.takeDamage(d, this);
             if (this.path === 2 && this.level >= 1) target.slowTimer = 5; 
             if (this.path === 2 && this.level >= 5) target.hp = 0; 
-            if (this.path === 2 && this.level >= 2) this.chainLightning(target, 2); 
+            if (this.path === 2 && this.level >= 2) this.chainLightning(target, 2, d); 
             return;
         }
         if (this.type === 'coil') {
-            this.chainLightning(target, 2 + this.level); 
+            this.chainLightning(target, 2 + this.level, dmg); 
             let pts = [{x:this.x, y:this.y}];
             let steps = 5;
             for(let i=1; i<steps; i++){
@@ -926,19 +914,18 @@ class Tower {
             return;
         }
         if (this.type === 'nullifier') {
-            let p = new Projectile(this.x, this.y, target, this.type, this.damage + (this.level*5), this.projectileSpeed, this);
-            // Nullifier upgrades handled in projectile or hit
-            if (this.path === 1 && this.level >= 1) p.explosionRadius = 40; // Nanites
+            let p = new Projectile(this.x, this.y, target, this.type, dmg + (this.level*5), this.projectileSpeed, this);
+            if (this.path === 1 && this.level >= 1) p.explosionRadius = 40; 
             projectiles.push(p);
             return;
         }
 
-        let p = new Projectile(this.x, this.y, target, this.type, this.damage, this.projectileSpeed, this);
+        let p = new Projectile(this.x, this.y, target, this.type, dmg, this.projectileSpeed, this);
         if (this.type === 'sentry') {
             if (this.path === 1 && this.level >= 2) p.pierce = 1;
             if (this.path === 1 && this.level >= 5) p.damage *= 10; 
             if (this.path === 2 && this.level >= 2) p.seeking = true;
-            if (this.path === 2 && this.level >= 3) { setTimeout(() => projectiles.push(new Projectile(this.x, this.y, target, this.type, this.damage, this.projectileSpeed, this)), 5); setTimeout(() => projectiles.push(new Projectile(this.x, this.y, target, this.type, this.damage, this.projectileSpeed, this)), 10); }
+            if (this.path === 2 && this.level >= 3) { setTimeout(() => projectiles.push(new Projectile(this.x, this.y, target, this.type, dmg, this.projectileSpeed, this)), 5); setTimeout(() => projectiles.push(new Projectile(this.x, this.y, target, this.type, dmg, this.projectileSpeed, this)), 10); }
         }
         if (this.type === 'mortar') {
              if (this.path === 1 && this.level >= 1) p.explosionRadius *= 1.5;
@@ -962,7 +949,7 @@ class Tower {
             particles.push(new Particle(this.x, this.y, '#ffd700', 5, 40));
         }
     }
-    chainLightning(target, bounces) {
+    chainLightning(target, bounces, dmg) {
         if (bounces <= 0) return;
         let nextTarget = null; let minD = 200; 
         for (const e of enemies) {
@@ -984,9 +971,9 @@ class Tower {
             visualEffects.push(new VisualEffect('lightning', 0, 0, {
                 points: pts, color: '#00FFFF', life: 5, width: 1.5
             }));
-            nextTarget.takeDamage(this.damage, this);
+            nextTarget.takeDamage(dmg, this);
             if (this.path === 2 && this.level >= 2) nextTarget.stunTimer = 10;
-            this.chainLightning(nextTarget, bounces - 1);
+            this.chainLightning(nextTarget, bounces - 1, dmg);
         }
     }
     
@@ -994,11 +981,21 @@ class Tower {
     draw() {
         ctx.save(); ctx.translate(this.x, this.y);
         
-        if (this === selectedTower || this.type === 'pylon') {
-            let r = this.range;
+        // Only show range if selected
+        if (this === selectedTower) {
+            let r = this.range * this.buffRangeMultiplier; // Visualize Buffed Range
             if (this.type === 'pylon' && this.path === 1 && this.level >= 1) r += 50;
             if (this.type === 'pylon' && this.path === 1 && this.level >= 3) r = 1000;
             ctx.beginPath(); ctx.arc(0, 0, r, 0, Math.PI * 2); ctx.fillStyle = C_RANGE; ctx.fill(); ctx.strokeStyle = C_RANGE_BORDER; ctx.stroke();
+        }
+
+        // Draw Sparkle if Buffed
+        if (this.buffDamageMultiplier > 1.0) {
+             ctx.save();
+             ctx.fillStyle = "#FFD700"; // Gold sparkle
+             ctx.globalAlpha = 0.6 + Math.sin(gameState.frames * 0.2) * 0.4;
+             ctx.beginPath(); ctx.arc(0, -25, 4, 0, Math.PI*2); ctx.fill();
+             ctx.restore();
         }
         
         // Base Rotation
@@ -1146,10 +1143,31 @@ function toggleAutoStart() {
 function selectTowerToBuild(type, el) {
     document.querySelectorAll('.tower-card').forEach(c => c.classList.remove('selected'));
     
-    if (buildMode === type) { buildMode = null; canvas.style.cursor = 'default'; }
-    else { buildMode = type; if(el) el.classList.add('selected'); canvas.style.cursor = 'crosshair'; selectedTower = null; updateUpgradeMenu(); }
+    // Close shop on selection to unobstruct view
+    if (document.getElementById('shop-dropdown')) {
+        document.getElementById('shop-dropdown').classList.remove('open');
+    }
+
+    if (buildMode === type) { 
+        buildMode = null; 
+        canvas.style.cursor = 'default'; 
+    } else { 
+        buildMode = type; 
+        // Logic to highlight the card if selected via hotkey
+        if (!el) {
+             // find the element
+             const cardId = 'card-' + type;
+             const card = document.getElementById(cardId);
+             if (card) card.classList.add('selected');
+        } else {
+             el.classList.add('selected'); 
+        }
+        
+        canvas.style.cursor = 'crosshair'; 
+        selectedTower = null; 
+        updateUpgradeMenu(); 
+    }
     
-    // Selecting Build cancels Ability
     if (gameState.activeAbility) {
         gameState.activeAbility = null;
         canvas.style.cursor = 'default';
@@ -1238,7 +1256,10 @@ function updateUpgradeMenu() {
     document.getElementById('selected-tower-name').innerText = selectedTower.name;
     document.getElementById('dps-display').innerText = "Total Dmg: " + Math.floor(selectedTower.totalDamage);
     const info = TOWER_TYPES[selectedTower.type];
-    document.getElementById('sell-value').innerText = Math.floor(info.cost * 0.7);
+    
+    // Apply Discount if buffed
+    let cost = info.cost * 0.7;
+    document.getElementById('sell-value').innerText = Math.floor(cost);
 
     const btn = document.getElementById('priority-btn');
     if (['miner','pylon','fabricator','vent'].includes(selectedTower.type)) btn.style.display = 'none'; 
@@ -1257,18 +1278,23 @@ function updateUpgradeMenu() {
 
     if (nextLvl > 5) return;
 
+    // Apply Cost Multiplier from Pylon Buffs
+    const discountMult = selectedTower.buffCostMultiplier || 1.0;
+
     if (selectedTower.path === 0 || selectedTower.path === 1) {
         const upg = info.upgrades.path1[selectedTower.level];
+        const cost = Math.floor(upg.cost * discountMult);
         document.getElementById('path-1-desc').innerText = upg.name + ": " + upg.desc;
-        document.getElementById('cost-1').innerText = upg.cost;
-        if (gameState.money >= upg.cost) p1Btn.disabled = false;
+        document.getElementById('cost-1').innerText = cost;
+        if (gameState.money >= cost) p1Btn.disabled = false;
     } else { document.getElementById('path-1-desc').innerText = "Path Locked"; }
 
     if (selectedTower.path === 0 || selectedTower.path === 2) {
         const upg = info.upgrades.path2[selectedTower.level];
+        const cost = Math.floor(upg.cost * discountMult);
         document.getElementById('path-2-desc').innerText = upg.name + ": " + upg.desc;
-        document.getElementById('cost-2').innerText = upg.cost;
-        if (gameState.money >= upg.cost) p2Btn.disabled = false;
+        document.getElementById('cost-2').innerText = cost;
+        if (gameState.money >= cost) p2Btn.disabled = false;
     } else { document.getElementById('path-2-desc').innerText = "Path Locked"; }
 }
 
@@ -1277,8 +1303,11 @@ function buyUpgrade(pathIdx) {
     const info = TOWER_TYPES[selectedTower.type];
     const upgradeList = pathIdx === 1 ? info.upgrades.path1 : info.upgrades.path2;
     const upgrade = upgradeList[selectedTower.level]; 
-    if (gameState.money >= upgrade.cost) {
-        gameState.money -= upgrade.cost;
+    const discountMult = selectedTower.buffCostMultiplier || 1.0;
+    const finalCost = Math.floor(upgrade.cost * discountMult);
+
+    if (gameState.money >= finalCost) {
+        gameState.money -= finalCost;
         selectedTower.path = pathIdx;
         selectedTower.level++;
         if (selectedTower.type === 'sentry' && pathIdx === 1) selectedTower.cooldownMax *= 0.8;
