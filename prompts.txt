@@ -1,0 +1,5 @@
+Improve the visuals, 
+
+First, improve the tower's visuals, and add more visual changes each time they are upgraded. 
+
+Then, make the tech upgrades give a glowing-neon, blue lines texture on top of the towers;  and for the magic upgrades add glowing neon magenta rune patterns. 
