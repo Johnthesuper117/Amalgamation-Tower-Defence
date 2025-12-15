@@ -1,6 +1,0 @@
-Make the Void lance tower pierce enemies, going though multiple enemies in the bullets path with its upgrades increasing how many enemies it can go through. 
-While upgrading,bind the keys Q and E to upgrade either Texh or Magic respectively. 
-Bind the Orbital Laser and Time Freeze abilities to Z and X keys respectively.
-Make sure that towers' effect bubble are effected by their upgrades and buffs appropriately.
-
-Make sure all the towers and their upgrades work properly, then test everything and fix any bugs, errors, glitches, etc you find. 
