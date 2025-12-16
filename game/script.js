@@ -50,19 +50,19 @@ const MAPS = [
 ];
 
 const ENEMIES = {
-basic: { hp: 20, speed: 2, color: "#a8b5c2", reward: 5, radius: 8, name: "Drone", shape: "circle", resistance: "none" },
-swarm: { hp: 5, speed: 5, color: "#ff00ff", reward: 2, radius: 5, name: "Nano-Swarm", shape: "triangle_small", resistance: "none" },
-fast: { hp: 15, speed: 3.5, color: "#00f3ff", reward: 8, radius: 7, name: "Glitch-Runner", shape: "arrow", resistance: "none" },
-tank: { hp: 120, speed: 1, color: "#6e7681", reward: 15, radius: 14, name: "Heavy Mech", shape: "square", resistance: "physical" }, 
-diamond: { hp: 500, speed: 1.2, color: "#00ffff", reward: 60, radius: 14, name: "Diamond Construct", shape: "diamond_solid", resistance: "physical" },
-dark_matter: { hp: 400, speed: 3.0, color: "#111111", reward: 70, radius: 12, name: "Dark Matter Wisp", shape: "star_dark", resistance: "energy" },
-elite: { hp: 600, speed: 1.5, color: "#DC143C", reward: 50, radius: 12, name: "Praetorian", shape: "diamond", resistance: "none" },
-regen: { hp: 200, speed: 1.8, color: "#32CD32", reward: 25, radius: 10, name: "Regenerator", shape: "cross", resistance: "none" },
-phase: { hp: 100, speed: 2.5, color: "#8A2BE2", reward: 35, radius: 9, name: "Phase-Shifter", shape: "star_4", resistance: "none" },
-centurion: { hp: 1000, speed: 1.2, color: "#FF8C00", reward: 100, radius: 18, name: "Flux Centurion", shape: "star_6", resistance: "physical" }, 
-boss: { hp: 3000, speed: 0.6, color: "#bd00ff", reward: 300, radius: 25, name: "Void Titan", shape: "skull", resistance: "none" }, 
-titan_mk2: { hp: 10000, speed: 0.4, color: "#fff", reward: 1000, radius: 35, name: "Omega Titan", shape: "omega", resistance: "all" },
-flyer: { hp: 80, speed: 3.0, color: "#FF4500", reward: 20, radius: 9, name: "Wrinkling", shape: "wing", resistance: "none", fly: true }
+    basic: { hp: 20, speed: 2, color: "#a8b5c2", reward: 5, damage: 1, radius: 8, name: "Drone", shape: "circle", resistance: "none" },
+    swarm: { hp: 5, speed: 5, color: "#ff00ff", reward: 2, damage: 1, radius: 5, name: "Nano-Swarm", shape: "triangle_small", resistance: "none" },
+    fast: { hp: 15, speed: 3.5, color: "#00f3ff", reward: 8, damage: 2, radius: 7, name: "Glitch-Runner", shape: "arrow", resistance: "none" },
+    tank: { hp: 120, speed: 1, color: "#6e7681", reward: 25, damage: 5, radius: 14, name: "Heavy Mech", shape: "square", resistance: "physical" }, 
+    diamond: { hp: 500, speed: 1.2, color: "#00ffff", reward: 80, damage: 10, radius: 14, name: "Diamond Construct", shape: "diamond_solid", resistance: "physical" },
+    dark_matter: { hp: 400, speed: 3.0, color: "#111111", reward: 100, damage: 15, radius: 12, name: "Dark Matter Wisp", shape: "star_dark", resistance: "energy" },
+    elite: { hp: 600, speed: 1.5, color: "#DC143C", reward: 75, damage: 20, radius: 12, name: "Praetorian", shape: "diamond", resistance: "none" },
+    regen: { hp: 200, speed: 1.8, color: "#32CD32", reward: 35, damage: 5, radius: 10, name: "Regenerator", shape: "cross", resistance: "none" },
+    phase: { hp: 100, speed: 2.5, color: "#8A2BE2", reward: 45, damage: 5, radius: 9, name: "Phase-Shifter", shape: "star_4", resistance: "none" },
+    centurion: { hp: 1000, speed: 1.2, color: "#FF8C00", reward: 150, damage: 25, radius: 18, name: "Flux Centurion", shape: "star_6", resistance: "physical" }, 
+    boss: { hp: 3000, speed: 0.6, color: "#bd00ff", reward: 500, damage: 50, radius: 25, name: "Void Titan", shape: "skull", resistance: "none" }, 
+    titan_mk2: { hp: 10000, speed: 0.4, color: "#fff", reward: 2000, damage: 100, radius: 35, name: "Omega Titan", shape: "omega", resistance: "all" },
+    flyer: { hp: 80, speed: 3.0, color: "#FF4500", reward: 25, damage: 3, radius: 9, name: "Wrinkling", shape: "wing", resistance: "none", fly: true }
 };
 
 const TOWER_TYPES = {
@@ -204,7 +204,7 @@ constructor(typeKey) {
     if (!type) { console.warn("Invalid enemy type detected: " + typeKey + ". Defaulting to 'basic'."); type = ENEMIES['basic']; }
     let diffMod = MAPS[gameState.mapIndex].difficultyMod;
     if (gameState.wave > 20) { diffMod += (gameState.wave - 20) * 0.1 * diffMod; }
-    this.hp = Math.floor(type.hp * diffMod); this.maxHp = this.hp; this.speed = type.speed;
+    this.hp = Math.floor(type.hp * diffMod); this.maxHp = this.hp; this.speed = type.speed; this.damage = type.damage || 1;
     this.color = type.color; this.reward = type.reward; this.radius = type.radius;
     this.name = type.name; this.shape = type.shape; this.resistance = type.resistance; this.fly = type.fly || false;
     
@@ -266,7 +266,17 @@ die(sourceTower) {
     Sound.play('explosion');
 }
 reachEnd() {
-    gameState.lives--; const idx = enemies.indexOf(this); if (idx > -1) enemies.splice(idx, 1);
+    // UPDATED: Use the specific damage value of the enemy type, default to 1 if missing
+    const dmg = this.damage || 1; 
+    gameState.lives -= dmg;
+    
+    // Visual feedback for losing lives
+    document.getElementById('lives-display').style.color = 'red';
+    setTimeout(() => document.getElementById('lives-display').style.color = '#fff', 200);
+
+    const idx = enemies.indexOf(this); 
+    if (idx > -1) enemies.splice(idx, 1);
+    
     if (gameState.lives <= 0 && !gameState.gameOver) endGame();
 }
 draw() {
@@ -310,7 +320,10 @@ update() {
     this.buffDamageMultiplier = 1.0;
     this.buffRangeMultiplier = 1.0;
     this.buffCostMultiplier = 1.0;
-    if (this.cooldown > 0) this.cooldown--; 
+
+    // UPDATED: If frozen, cooldown recovers at half speed (0.5). Otherwise full speed (1).
+    let decrement = (gameState.freezeTimer > 0) ? 0.5 : 1;
+    if (this.cooldown > 0) this.cooldown -= decrement; 
 }
 
 getTarget(candidates) {
@@ -330,7 +343,6 @@ getTarget(candidates) {
 }
 
 act() {
-    if (gameState.freezeTimer > 0) return; 
 
     let cd = this.cooldownMax / this.buffSpeedMultiplier;
     this.currentTarget = null;
@@ -852,21 +864,49 @@ for(const key in TOWER_TYPES) {
 }
 
 function updateUI() {
-document.getElementById('money-display').innerText = gameState.money;
-document.getElementById('lives-display').innerText = gameState.lives;
-const waveText = document.getElementById('wave-display');
-waveText.innerText = gameState.wave;
-if (gameState.endless) waveText.classList.add('endless');
-else waveText.classList.remove('endless');
+    document.getElementById('money-display').innerText = gameState.money;
+    document.getElementById('lives-display').innerText = gameState.lives;
+    
+    const waveText = document.getElementById('wave-display');
+    waveText.innerText = gameState.wave;
+    if (gameState.endless) waveText.classList.add('endless');
+    else waveText.classList.remove('endless');
 
-// Ability CDs
-const laserPct = Math.min(100, (gameState.abilities.laser.cd / gameState.abilities.laser.maxCd) * 100);
-document.getElementById('cd-laser').style.height = laserPct + "%";
+    // Ability CDs
+    const laserPct = Math.min(100, (gameState.abilities.laser.cd / gameState.abilities.laser.maxCd) * 100);
+    document.getElementById('cd-laser').style.height = laserPct + "%";
 
-const freezePct = Math.min(100, (gameState.abilities.freeze.cd / gameState.abilities.freeze.maxCd) * 100);
-document.getElementById('cd-freeze').style.height = freezePct + "%";
+    const freezePct = Math.min(100, (gameState.abilities.freeze.cd / gameState.abilities.freeze.maxCd) * 100);
+    document.getElementById('cd-freeze').style.height = freezePct + "%";
 
-refreshShopAffordability();
+    refreshShopAffordability();
+
+    // UPDATED: Check upgrade menu buttons every frame
+    if (selectedTower) {
+        const info = TOWER_TYPES[selectedTower.type];
+        const discountMult = selectedTower.buffCostMultiplier || 1.0;
+        
+        // Check Path 1 Button
+        const p1Btn = document.getElementById('btn-upgrade-1');
+        if (selectedTower.path === 0 || selectedTower.path === 1) {
+             // Safety check for max level
+             if (selectedTower.level < 5) {
+                const upg = info.upgrades.path1[selectedTower.level];
+                const cost = Math.floor(upg.cost * discountMult);
+                p1Btn.disabled = (gameState.money < cost); // Auto-disable if too expensive
+             }
+        }
+        
+        // Check Path 2 Button
+        const p2Btn = document.getElementById('btn-upgrade-2');
+        if (selectedTower.path === 0 || selectedTower.path === 2) {
+             if (selectedTower.level < 5) {
+                const upg = info.upgrades.path2[selectedTower.level];
+                const cost = Math.floor(upg.cost * discountMult);
+                p2Btn.disabled = (gameState.money < cost); // Auto-disable if too expensive
+             }
+        }
+    }
 }
 
 function updateUpgradeMenu() {

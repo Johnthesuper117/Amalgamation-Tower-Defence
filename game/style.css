@@ -213,21 +213,40 @@ canvas {
 
 /* Modals */
 #upgrade-modal {
-    position: absolute;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 500px;
-    background: rgba(22, 27, 34, 0.98);
-    border: 1px solid #30363d;
-    padding: 15px;
-    border-radius: 8px;
-    display: none;
-    flex-direction: column;
-    gap: 10px;
-    z-index: 100;
-    backdrop-filter: blur(10px);
-    box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+    width: 300px; /* Reduced width */
+    padding: 10px; /* Reduced padding */
+    bottom: 10px;
+    right: 10px;
+    left: auto;
+    top: auto;
+    transform: none;
+    font-size: 0.9em; /* Slightly smaller text */
+    border: 1px solid #444;
+    background: rgba(20, 20, 25, 0.95);
+    box-shadow: 0 0 15px rgba(0,0,0,0.8);
+    z-index: 1000;
+}
+
+#upgrade-modal h3 {
+    margin: 5px 0;
+    font-size: 1.1em;
+}
+
+#upgrade-modal .upgrade-row {
+    margin-bottom: 5px;
+}
+
+#upgrade-modal button {
+    padding: 4px 8px;
+    font-size: 0.85em;
+}
+
+/* Ensure close button is visible */
+#upgrade-modal .close-btn {
+    top: 5px;
+    right: 10px;
+    font-size: 1.2em;
+    cursor: pointer;
 }
 
 .upgrade-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #444; padding-bottom: 5px; }
