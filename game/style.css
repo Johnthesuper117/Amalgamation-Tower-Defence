@@ -213,23 +213,28 @@ canvas {
 
 /* Modals */
 #upgrade-modal {
-    /* Overlay positioning */
-    position: absolute; 
-    bottom: 10px;
-    right: 10px;
-    z-index: 100; /* Ensures it sits ON TOP of the canvas */
+    position: absolute;
+    z-index: 100;
     
-    /* Size and Appearance */
-    display: none; /* Hidden by default, toggled by JS */
+    /* Remove fixed positioning */
+    bottom: auto; 
+    right: auto;
+    
+    /* These will be set by JS, but good to have defaults */
+    top: 0;
+    left: 0;
+
+    /* Keep the sizing/style from before */
+    display: none; 
     flex-direction: column;
-    width: 260px; /* Much narrower */
+    width: 260px;
     padding: 10px;
-    background: rgba(10, 15, 20, 0.95); /* Dark semi-transparent background */
+    background: rgba(10, 15, 20, 0.95);
     border: 1px solid #444;
     border-radius: 8px;
     color: #fff;
     font-family: 'Courier New', Courier, monospace;
-    font-size: 12px; /* Smaller text */
+    font-size: 12px;
     box-shadow: 0 0 10px rgba(0,0,0,0.5);
 }
 

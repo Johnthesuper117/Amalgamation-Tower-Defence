@@ -910,51 +910,97 @@ function updateUI() {
 }
 
 function updateUpgradeMenu() {
-const menu = document.getElementById('upgrade-modal');
-if (!selectedTower) { menu.style.display = "none"; return; }
+    const menu = document.getElementById('upgrade-modal');
+    
+    // 1. Basic Hide/Show Logic
+    if (!selectedTower) { 
+        menu.style.display = "none"; 
+        return; 
+    }
+    
+    // IMPORTANT: We must display it first so the browser can calculate its width/height
+    menu.style.display = "flex";
 
-menu.style.display = "flex";
-document.getElementById('selected-tower-name').innerText = selectedTower.name;
-document.getElementById('dps-display').innerText = "Total Dmg: " + Math.floor(selectedTower.totalDamage);
-const info = TOWER_TYPES[selectedTower.type];
+    // --- Content Update Logic (Same as before) ---
+    document.getElementById('selected-tower-name').innerText = selectedTower.name;
+    document.getElementById('dps-display').innerText = "Total Dmg: " + Math.floor(selectedTower.totalDamage);
+    
+    const info = TOWER_TYPES[selectedTower.type];
+    let sellCost = info.cost * 0.7;
+    document.getElementById('sell-value').innerText = Math.floor(sellCost);
 
-let cost = info.cost * 0.7;
-document.getElementById('sell-value').innerText = Math.floor(cost);
+    const btn = document.getElementById('priority-btn');
+    if (['miner','pylon','fabricator','vent'].includes(selectedTower.type)) btn.style.display = 'none'; 
+    else {
+        btn.style.display = 'inline-block';
+        btn.innerText = "Target: " + selectedTower.priority.charAt(0).toUpperCase() + selectedTower.priority.slice(1);
+    }
 
-const btn = document.getElementById('priority-btn');
-if (['miner','pylon','fabricator','vent'].includes(selectedTower.type)) btn.style.display = 'none'; 
-else {
-    btn.style.display = 'inline-block';
-    btn.innerText = "Target: " + selectedTower.priority.charAt(0).toUpperCase() + selectedTower.priority.slice(1);
-}
+    const nextLvl = selectedTower.level + 1;
+    const p1Btn = document.getElementById('btn-upgrade-1');
+    const p2Btn = document.getElementById('btn-upgrade-2');
 
-const nextLvl = selectedTower.level + 1;
-const p1Btn = document.getElementById('btn-upgrade-1');
-const p2Btn = document.getElementById('btn-upgrade-2');
+    p1Btn.disabled = true; p2Btn.disabled = true;
+    document.getElementById('path-1-desc').innerText = "Maxed"; document.getElementById('cost-1').innerText = "-";
+    document.getElementById('path-2-desc').innerText = "Maxed"; document.getElementById('cost-2').innerText = "-";
 
-p1Btn.disabled = true; p2Btn.disabled = true;
-document.getElementById('path-1-desc').innerText = "Maxed"; document.getElementById('cost-1').innerText = "-";
-document.getElementById('path-2-desc').innerText = "Maxed"; document.getElementById('cost-2').innerText = "-";
+    const discountMult = selectedTower.buffCostMultiplier || 1.0;
 
-if (nextLvl > 5) return;
+    // Check Path 1
+    if ((selectedTower.path === 0 || selectedTower.path === 1) && selectedTower.level < 5) {
+        const upg = info.upgrades.path1[selectedTower.level];
+        const cost = Math.floor(upg.cost * discountMult);
+        document.getElementById('path-1-desc').innerText = upg.name + ": " + upg.desc;
+        document.getElementById('cost-1').innerText = cost;
+        // Auto-disable if too expensive
+        if (gameState.money >= cost) p1Btn.disabled = false;
+    } else if (selectedTower.path === 2) {
+        document.getElementById('path-1-desc').innerText = "Path Locked";
+    }
 
-const discountMult = selectedTower.buffCostMultiplier || 1.0;
+    // Check Path 2
+    if ((selectedTower.path === 0 || selectedTower.path === 2) && selectedTower.level < 5) {
+        const upg = info.upgrades.path2[selectedTower.level];
+        const cost = Math.floor(upg.cost * discountMult);
+        document.getElementById('path-2-desc').innerText = upg.name + ": " + upg.desc;
+        document.getElementById('cost-2').innerText = cost;
+        // Auto-disable if too expensive
+        if (gameState.money >= cost) p2Btn.disabled = false;
+    } else if (selectedTower.path === 1) {
+        document.getElementById('path-2-desc').innerText = "Path Locked";
+    }
 
-if (selectedTower.path === 0 || selectedTower.path === 1) {
-    const upg = info.upgrades.path1[selectedTower.level];
-    const cost = Math.floor(upg.cost * discountMult);
-    document.getElementById('path-1-desc').innerText = upg.name + ": " + upg.desc;
-    document.getElementById('cost-1').innerText = cost;
-    if (gameState.money >= cost) p1Btn.disabled = false;
-} else { document.getElementById('path-1-desc').innerText = "Path Locked"; }
+    // --- NEW: Dynamic Positioning Logic ---
+    
+    const towerX = selectedTower.x;
+    const towerY = selectedTower.y;
+    const menuWidth = menu.offsetWidth;
+    const menuHeight = menu.offsetHeight;
+    
+    // Vertical Spacing (Tower Radius + Buffer)
+    const spacing = 40; 
+    
+    // 1. Calculate Horizontal Position (Center it)
+    let left = towerX - (menuWidth / 2);
+    
+    // Clamp to edges (Don't let it go off screen left or right)
+    // padding of 10px from edge
+    if (left < 10) left = 10;
+    if (left + menuWidth > CANVAS_WIDTH - 10) left = CANVAS_WIDTH - menuWidth - 10;
 
-if (selectedTower.path === 0 || selectedTower.path === 2) {
-    const upg = info.upgrades.path2[selectedTower.level];
-    const cost = Math.floor(upg.cost * discountMult);
-    document.getElementById('path-2-desc').innerText = upg.name + ": " + upg.desc;
-    document.getElementById('cost-2').innerText = cost;
-    if (gameState.money >= cost) p2Btn.disabled = false;
-} else { document.getElementById('path-2-desc').innerText = "Path Locked"; }
+    // 2. Calculate Vertical Position
+    // Default: Place UNDER the tower
+    let top = towerY + spacing;
+
+    // Check if it hits the bottom of the screen
+    if (top + menuHeight > CANVAS_HEIGHT - 10) {
+        // FLIP IT: Place ABOVE the tower
+        top = towerY - spacing - menuHeight;
+    }
+
+    // Apply coordinates
+    menu.style.left = left + "px";
+    menu.style.top = top + "px";
 }
 
 function buyUpgrade(pathIdx) {
