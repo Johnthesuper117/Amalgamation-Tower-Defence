@@ -115,15 +115,25 @@ body {
 
 /* Right Panel (Shop) */
 #right-panel {
-    grid-area: right;
+        grid-area: right;
+    position: fixed; /* Fix it to the window */
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 220px; /* Adjust width as needed */
+    height: 100vh; /* Full viewport height */
     background: var(--ui-bg);
     border-left: 1px solid #30363d;
+    overflow-y: auto; /* Scroll only if screen is very short */
+    z-index: 50; /* Below the upgrade popup (100) */
+    padding: 10px;
+    padding-top: 20px;
     display: flex;
     flex-direction: column;
-    padding: 10px;
-    z-index: 10;
-    overflow: hidden; /* Container handles overflow */
+    align-items: center;
+    box-shadow: -5px 0 15px rgba(0,0,0,0.5);
 }
+
 
 #shop-list {
     flex: 1;

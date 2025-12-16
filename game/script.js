@@ -279,26 +279,58 @@ reachEnd() {
     
     if (gameState.lives <= 0 && !gameState.gameOver) endGame();
 }
+// Inside class Enemy
 draw() {
-    ctx.save(); ctx.translate(this.x, this.y); ctx.fillStyle = this.color; ctx.strokeStyle = '#fff'; ctx.lineWidth = 1;
-    ctx.beginPath();
-    if (this.shape === 'circle') { ctx.arc(0, 0, this.radius, 0, Math.PI * 2); }
-    else if (this.shape === 'square') { ctx.fillRect(-this.radius, -this.radius, this.radius*2, this.radius*2); ctx.rect(-this.radius, -this.radius, this.radius*2, this.radius*2); }
-    else if (this.shape === 'triangle' || this.shape === 'triangle_small') { ctx.moveTo(0, -this.radius); ctx.lineTo(this.radius, this.radius); ctx.lineTo(-this.radius, this.radius); ctx.closePath(); }
-    else if (this.shape === 'pentagon') { for (let i = 0; i < 5; i++) { ctx.lineTo(this.radius * Math.cos(i * 2 * Math.PI / 5 - Math.PI/2), this.radius * Math.sin(i * 2 * Math.PI / 5 - Math.PI/2)); } ctx.closePath(); }
-    else if (this.shape === 'diamond') { ctx.moveTo(0, -this.radius * 1.5); ctx.lineTo(this.radius, 0); ctx.lineTo(0, this.radius * 1.5); ctx.lineTo(-this.radius, 0); ctx.closePath(); }
-    else if (this.shape === 'star_6' || this.shape === 'star_4') { const points = this.shape === 'star_6' ? 6 : 4; for(let i=0; i<points*2; i++){ const r = (i%2 === 0) ? this.radius : this.radius/2; const a = (Math.PI * i) / points; ctx.lineTo(r * Math.cos(a), r * Math.sin(a)); } ctx.closePath(); }
-    else if (this.shape === 'skull' || this.shape === 'omega') { ctx.arc(0, 0, this.radius, 0, Math.PI * 2); ctx.moveTo(-5, -5); ctx.lineTo(5, 5); ctx.moveTo(5, -5); ctx.lineTo(-5, 5); }
-    else if (this.shape === 'arrow') { ctx.moveTo(this.radius, 0); ctx.lineTo(-this.radius, -this.radius/2); ctx.lineTo(-this.radius, this.radius/2); ctx.closePath(); }
-    else if (this.shape === 'cross') { ctx.fillRect(-this.radius, -this.radius/3, this.radius*2, this.radius/1.5); ctx.fillRect(-this.radius/3, -this.radius, this.radius/1.5, this.radius*2); }
-    else if (this.shape === 'diamond_solid') { ctx.rotate(Math.PI/4); ctx.fillRect(-this.radius, -this.radius, this.radius*2, this.radius*2); }
-    else if (this.shape === 'star_dark') { for(let i=0; i<8; i++){ const r = (i%2 === 0) ? this.radius : this.radius/3; const a = (Math.PI * i) / 4; ctx.lineTo(r * Math.cos(a), r * Math.sin(a)); } ctx.closePath(); }
-    else if (this.shape === 'wing') { ctx.moveTo(0,0); ctx.lineTo(-10, -5); ctx.lineTo(-5, 0); ctx.lineTo(-10, 5); ctx.fill(); } 
+    ctx.save();
+    ctx.translate(this.x, this.y);
     
-    ctx.fill(); ctx.stroke(); ctx.restore();
-    const hpPercent = Math.max(0, this.hp / this.maxHp);
-    ctx.fillStyle = '#ff0000'; ctx.fillRect(this.x - 10, this.y - this.radius - 8, 20, 4);
-    ctx.fillStyle = '#00ff00'; ctx.fillRect(this.x - 10, this.y - this.radius - 8, 20 * hpPercent, 4);
+    // Health Bar (Cleaner)
+    const hpPct = this.hp / this.maxHp;
+    ctx.fillStyle = "rgba(255, 0, 0, 0.7)";
+    ctx.fillRect(-10, -20, 20, 4);
+    ctx.fillStyle = "#0f0";
+    ctx.fillRect(-10, -20, 20 * hpPct, 4);
+
+    // Dynamic Wobble for Hover effect
+    const hover = Math.sin(gameState.frames * 0.1) * 2;
+    ctx.translate(0, hover);
+
+    // Glow
+    ctx.shadowBlur = 10;
+    ctx.shadowColor = this.color;
+    ctx.fillStyle = this.color;
+
+    // Detailed Shapes
+    ctx.beginPath();
+    if (this.shape === 'circle') {
+        ctx.arc(0, 0, this.radius, 0, Math.PI * 2); ctx.fill();
+        // "Eye"
+        ctx.fillStyle = "#000"; ctx.beginPath(); ctx.arc(0, 0, this.radius/2, 0, Math.PI*2); ctx.fill();
+        ctx.fillStyle = "red"; ctx.beginPath(); ctx.arc(0, 0, 2, 0, Math.PI*2); ctx.fill();
+    } 
+    else if (this.shape === 'square') {
+        ctx.fillRect(-this.radius, -this.radius, this.radius*2, this.radius*2);
+        // "Armor Plates"
+        ctx.strokeStyle = "#000"; ctx.lineWidth = 2; ctx.strokeRect(-this.radius, -this.radius, this.radius*2, this.radius*2);
+        ctx.beginPath(); ctx.moveTo(-this.radius, -this.radius); ctx.lineTo(this.radius, this.radius); ctx.stroke();
+    }
+    else if (this.shape === 'diamond' || this.shape === 'diamond_solid') {
+        ctx.rotate(Math.PI / 4);
+        ctx.fillRect(-this.radius, -this.radius, this.radius*2, this.radius*2);
+        ctx.fillStyle = "#fff"; ctx.fillRect(-3,-3,6,6); // Core
+    }
+    else {
+        // Fallback / other shapes
+        ctx.arc(0, 0, this.radius, 0, Math.PI * 2); ctx.fill();
+    }
+    
+    // Frost/Stun Indicators
+    if (this.slowTimer > 0) {
+        ctx.strokeStyle = "#00ffff"; ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.arc(0,0, this.radius + 4, 0, Math.PI*2); ctx.stroke();
+    }
+    
+    ctx.restore();
 }
 }
 
@@ -548,89 +580,141 @@ chainLightning(target, bounces, dmg) {
     }
 }
 
-// Updated Draw Function with VISUALS
+// Inside class Tower
 draw() {
-    ctx.save(); ctx.translate(this.x, this.y);
-    
-    // Only show range if selected
-    if (this === selectedTower) {
-        let r = this.range * this.buffRangeMultiplier; // Visualize Buffed Range
-        if (this.type === 'pylon' && this.path === 1 && this.level >= 1) r += 50;
-        if (this.type === 'pylon' && this.path === 1 && this.level >= 3) r = 1000;
-        ctx.beginPath(); ctx.arc(0, 0, r, 0, Math.PI * 2); ctx.fillStyle = C_RANGE; ctx.fill(); ctx.strokeStyle = C_RANGE_BORDER; ctx.stroke();
+    ctx.save();
+    ctx.translate(this.x, this.y);
+
+    // 1. Draw Range Bubble (Updated Logic)
+    if (this === selectedTower || this.type === 'pylon') {
+        // Calculate actual range including buffs
+        let r = this.range * this.buffRangeMultiplier;
+        
+        // Specific Pylon Rules
+        if (this.type === 'pylon') {
+            if (this.path === 1 && this.level >= 1) r += 50;
+            if (this.path === 1 && this.level >= 3) r = 2000; // Global range
+        }
+
+        ctx.beginPath();
+        ctx.arc(0, 0, r, 0, Math.PI * 2);
+        
+        // Pylons always show range faintly, selected towers show it clearly
+        if (this === selectedTower) {
+            ctx.fillStyle = "rgba(0, 255, 255, 0.1)";
+            ctx.strokeStyle = "rgba(0, 255, 255, 0.5)";
+            ctx.setLineDash([5, 5]); // Dotted line for range
+        } else {
+            ctx.fillStyle = "rgba(255, 215, 0, 0.03)";
+            ctx.strokeStyle = "rgba(255, 215, 0, 0.1)";
+            ctx.setLineDash([]);
+        }
+        
+        ctx.fill();
+        ctx.stroke();
+        ctx.setLineDash([]); // Reset
     }
 
-    // Draw Sparkle if Buffed
-    if (this.buffDamageMultiplier > 1.0) {
+    // 2. Base Pedestal (Detailed)
+    let grad = ctx.createRadialGradient(0, 0, 5, 0, 0, 16);
+    grad.addColorStop(0, "#333");
+    grad.addColorStop(1, "#111");
+    ctx.fillStyle = grad;
+    
+    // Draw bolts on the base
+    ctx.beginPath(); ctx.arc(0, 0, 14, 0, Math.PI * 2); ctx.fill();
+    ctx.strokeStyle = "#444"; ctx.lineWidth = 2; ctx.stroke();
+    ctx.fillStyle = "#555";
+    for(let i=0; i<4; i++) {
+        ctx.beginPath(); ctx.arc(10 * Math.cos(i*Math.PI/2 + Math.PI/4), 10 * Math.sin(i*Math.PI/2 + Math.PI/4), 2, 0, Math.PI*2); ctx.fill();
+    }
+
+    // 3. Rotation for Turret Head
+    // Some towers don't rotate their whole body
+    if (!['pylon','miner','fabricator','nullifier'].includes(this.type)) ctx.rotate(this.angle);
+
+    // 4. Main Tower Body (Vibrant & Detailed)
+    let bodyGrad = ctx.createLinearGradient(-10, -10, 10, 10);
+    bodyGrad.addColorStop(0, this.color);
+    bodyGrad.addColorStop(0.5, adjustColor(this.color, -30)); // Darker center
+    bodyGrad.addColorStop(1, this.color);
+    ctx.fillStyle = bodyGrad;
+    
+    // Shapes
+    ctx.shadowBlur = 10; ctx.shadowColor = this.color;
+    if (this.shape === 'square') { 
+        ctx.fillRect(-10, -10, 20, 20); 
+        // Barrel
+        ctx.fillStyle = "#222"; ctx.fillRect(10, -3, 8, 6);
+    } 
+    else if (this.shape === 'triangle') { 
+        ctx.beginPath(); ctx.moveTo(18, 0); ctx.lineTo(-8, 10); ctx.lineTo(-8, -10); ctx.fill();
+        // Core glow
+        ctx.fillStyle = "#fff"; ctx.beginPath(); ctx.arc(0,0,3,0,Math.PI*2); ctx.fill();
+    } 
+    else if (this.shape === 'circle') { 
+        ctx.beginPath(); ctx.arc(0, 0, 12, 0, Math.PI * 2); ctx.fill();
+        // Rotating Ring
+        ctx.strokeStyle = "#fff"; ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.arc(0, 0, 8, 0, Math.PI*2); ctx.stroke();
+    }
+    else if (this.shape === 'orb') {
+        ctx.fillStyle = this.color; ctx.beginPath(); ctx.arc(0,0,10,0,Math.PI*2); ctx.fill();
+        ctx.fillStyle = "rgba(255,255,255,0.8)"; ctx.beginPath(); ctx.arc(-3,-3,3,0,Math.PI*2); ctx.fill();
+    }
+    ctx.shadowBlur = 0;
+
+    // 5. Tech / Magic Overlays (SMALLER & CLEANER)
+    // We use a smaller scale so it doesn't cover the tower
+    if (this.path > 0 && this.level > 0) {
         ctx.save();
-        ctx.fillStyle = "#FFD700"; // Gold sparkle
-        ctx.globalAlpha = 0.6 + Math.sin(gameState.frames * 0.2) * 0.4;
-        ctx.beginPath(); ctx.arc(0, -25, 4, 0, Math.PI*2); ctx.fill();
+        ctx.scale(0.6, 0.6); // <--- Key change: Reduce size by 40%
+        ctx.lineWidth = 3;
+        
+        if (this.path === 1) { // TECH (Cyan Wires)
+            ctx.strokeStyle = "#00f3ff"; 
+            ctx.shadowColor = "#00f3ff"; 
+            ctx.shadowBlur = 5;
+            ctx.beginPath();
+            // Circuit pattern based on level
+            if (this.level >= 1) ctx.strokeRect(-12, -12, 24, 24);
+            if (this.level >= 3) { ctx.moveTo(-12, 0); ctx.lineTo(12, 0); ctx.moveTo(0, -12); ctx.lineTo(0, 12); }
+            if (this.level >= 5) { ctx.beginPath(); ctx.arc(0,0,18,0,Math.PI*2); }
+            ctx.stroke();
+        } 
+        else if (this.path === 2) { // MAGIC (Purple Runes)
+            ctx.strokeStyle = "#bd00ff";
+            ctx.shadowColor = "#bd00ff";
+            ctx.shadowBlur = 5;
+            ctx.beginPath();
+            // Rune pattern
+            if (this.level >= 1) { ctx.moveTo(0, -15); ctx.lineTo(10, 5); ctx.lineTo(-10, 5); ctx.closePath(); } // Triangle
+            if (this.level >= 3) { ctx.arc(0, 0, 16, 0, Math.PI*2); }
+            if (this.level >= 5) { 
+                ctx.save(); ctx.rotate(gameState.frames * 0.05); 
+                ctx.rect(-10,-10,20,20); 
+                ctx.restore(); 
+            }
+            ctx.stroke();
+        }
         ctx.restore();
     }
     
-    // Base Rotation
-    if (!['pylon','miner','fabricator','nullifier','vent'].includes(this.type)) ctx.rotate(this.angle);
-    else if (this.type === 'vent') ctx.rotate(this.angle);
-
-    // Pedestal
-    ctx.fillStyle = "#111";
-    ctx.shadowBlur = 0;
-    if (this.path === 2) { 
-        ctx.beginPath();
-        for(let i=0; i<6; i++) { ctx.lineTo(16 * Math.cos(i * Math.PI / 3), 16 * Math.sin(i * Math.PI / 3)); }
-        ctx.closePath(); ctx.fill(); ctx.strokeStyle = "#444"; ctx.lineWidth = 1; ctx.stroke();
-    } else { 
-        ctx.fillRect(-14, -14, 28, 28); ctx.strokeStyle = "#444"; ctx.lineWidth = 1; ctx.strokeRect(-14, -14, 28, 28);
-    }
-
-    // Body
-    let grad = ctx.createLinearGradient(-10, -10, 10, 10);
-    grad.addColorStop(0, this.color); grad.addColorStop(1, '#1a1a1a'); 
-    ctx.fillStyle = grad;
-
-    if (this.shape === 'square') { ctx.fillRect(-10, -10, 20, 20); ctx.fillStyle = "#000"; ctx.fillRect(-4, -4, 8, 8); }
-    else if (this.shape === 'triangle') { ctx.beginPath(); ctx.moveTo(15, 0); ctx.lineTo(-10, 10); ctx.lineTo(-10, -10); ctx.fill(); ctx.beginPath(); ctx.moveTo(5, 0); ctx.lineTo(-5, 5); ctx.lineTo(-5, -5); ctx.fillStyle = "#000"; ctx.fill(); }
-    else if (this.shape === 'circle') { ctx.beginPath(); ctx.arc(0, 0, 12, 0, Math.PI * 2); ctx.fill(); ctx.beginPath(); ctx.arc(0, 0, 6, 0, Math.PI * 2); ctx.fillStyle = "#000"; ctx.fill(); }
-    else if (this.shape === 'orb') { 
-        ctx.beginPath(); ctx.arc(0, 0, 10, 0, Math.PI * 2); ctx.fillStyle = this.color; ctx.fill();
-        ctx.globalAlpha = 0.5; ctx.beginPath(); ctx.arc(0, 0, 12 + Math.sin(gameState.frames*0.1)*2, 0, Math.PI * 2); ctx.stroke(); ctx.globalAlpha = 1.0;
-    }
-
-    // Overlay Textures
-    ctx.shadowBlur = 8; ctx.lineWidth = 2;
-    
-    if (this.path === 1) { // TECH
-        ctx.strokeStyle = "#00f3ff"; ctx.shadowColor = "#00f3ff"; ctx.beginPath();
-        if (this.level >= 1) { ctx.moveTo(-10, -10); ctx.lineTo(-5, -5); ctx.moveTo(10, 10); ctx.lineTo(5, 5); ctx.moveTo(10, -10); ctx.lineTo(5, -5); ctx.moveTo(-10, 10); ctx.lineTo(-5, 5); }
-        if (this.level >= 2) { ctx.rect(-5, -5, 10, 10); }
-        if (this.level >= 3) { ctx.moveTo(0, -10); ctx.lineTo(0, -5); ctx.moveTo(0, 10); ctx.lineTo(0, 5); ctx.moveTo(-10, 0); ctx.lineTo(-5, 0); ctx.moveTo(10, 0); ctx.lineTo(5, 0); }
-        if (this.level >= 4) { ctx.moveTo(-8, -8); ctx.lineTo(8, -8); ctx.moveTo(8, -8); ctx.lineTo(8, 8); ctx.moveTo(8, 8); ctx.lineTo(-8, 8); ctx.moveTo(-8, 8); ctx.lineTo(-8, -8); ctx.fillRect(-12,-12,4,4); ctx.fillRect(8,-12,4,4); ctx.fillRect(8,8,4,4); ctx.fillRect(-12,8,4,4); }
-        if (this.level >= 5) { ctx.shadowBlur = 15; ctx.arc(0,0, 16, 0, Math.PI*2); }
-        ctx.stroke(); ctx.shadowBlur = 0; 
-    } 
-    else if (this.path === 2) { // MAGIC
-        ctx.strokeStyle = "#bd00ff"; ctx.shadowColor = "#bd00ff"; ctx.beginPath();
-        if (this.level >= 1) { ctx.arc(0, 0, 4, 0, Math.PI*2); } 
-        if (this.level >= 2) { ctx.moveTo(0, -8); ctx.lineTo(7, 4); ctx.lineTo(-7, 4); ctx.closePath(); }
-        if (this.level >= 3) { ctx.moveTo(10, 0); ctx.arc(0, 0, 10, 0, Math.PI*2); ctx.moveTo(0, -12); ctx.lineTo(0, -8); ctx.moveTo(0, 12); ctx.lineTo(0, 8); ctx.moveTo(-12, 0); ctx.lineTo(-8, 0); ctx.moveTo(12, 0); ctx.lineTo(8, 0); }
-        if (this.level >= 4) { ctx.rect(-6, -6, 12, 12); ctx.moveTo(-6, -6); ctx.lineTo(6, 6); ctx.moveTo(6, -6); ctx.lineTo(-6, 6); }
-        if (this.level >= 5) { ctx.shadowBlur = 15; for(let i=0; i<5; i++){ ctx.moveTo(15 * Math.cos(i * 4 * Math.PI / 5 - Math.PI/2), 15 * Math.sin(i * 4 * Math.PI / 5 - Math.PI/2)); ctx.lineTo(15 * Math.cos((i+2) * 4 * Math.PI / 5 - Math.PI/2), 15 * Math.sin((i+2) * 4 * Math.PI / 5 - Math.PI/2)); } }
-        ctx.stroke(); ctx.shadowBlur = 0;
-    }
-
+    // Level Dots (Tiny, clear white dots at bottom)
     ctx.fillStyle = "#fff";
-    for(let i=0; i<this.level; i++) { ctx.beginPath(); ctx.arc(-12 + (i*6), -22, 2, 0, Math.PI*2); ctx.fill(); }
-    
-    if (this.type === 'prism' && this.currentTarget && enemies.includes(this.currentTarget)) {
-        ctx.restore(); ctx.save();
-        ctx.beginPath(); ctx.moveTo(this.x, this.y); ctx.lineTo(this.currentTarget.x, this.currentTarget.y);
-        ctx.strokeStyle = this.color; ctx.lineWidth = 2 + this.level; ctx.shadowColor = this.color; ctx.shadowBlur = 10; ctx.stroke(); ctx.shadowBlur = 0;
-        return; 
+    const dotStart = -((this.level-1) * 3);
+    for(let i=0; i<this.level; i++) { 
+        ctx.beginPath(); 
+        ctx.arc(dotStart + (i*6), 18, 1.5, 0, Math.PI*2); 
+        ctx.fill(); 
     }
+
     ctx.restore();
 }
 }
+
+// Helper for darkening colors
+
 
 class Projectile {
 constructor(x, y, target, type, damage, speed, sourceTower) {
@@ -1248,94 +1332,153 @@ particles = particles.filter(p => p.life > 0);
 }
 
 function drawGame() {
-ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+    // 1. Vibrant Background (Tech Grid + Magic Fog)
+    // Dark background
+    ctx.fillStyle = "#050510"; 
+    ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
-if (pathPoints.length > 0) {
+    // Draw Grid
+    ctx.strokeStyle = "rgba(0, 243, 255, 0.05)";
+    ctx.lineWidth = 1;
+    const gridSize = 40;
+    
+    // Moving Grid Effect
+    const offset = (gameState.frames * 0.5) % gridSize;
+    
     ctx.beginPath();
-    ctx.moveTo(pathPoints[0].x, pathPoints[0].y);
-    for(let i=1; i<pathPoints.length; i++) ctx.lineTo(pathPoints[i].x, pathPoints[i].y);
-    ctx.lineCap = "round"; ctx.lineJoin = "round";
-    ctx.lineWidth = GRID_SIZE; ctx.strokeStyle = C_PATH_BORDER; ctx.stroke();
-    ctx.lineWidth = GRID_SIZE - 4; ctx.strokeStyle = C_PATH; ctx.stroke();
-    ctx.lineWidth = 2; ctx.setLineDash([10, 20]); ctx.strokeStyle = "rgba(0, 243, 255, 0.1)"; ctx.stroke(); ctx.setLineDash([]);
+    for(let x=0; x<=CANVAS_WIDTH; x+=gridSize) { ctx.moveTo(x, 0); ctx.lineTo(x, CANVAS_HEIGHT); }
+    for(let y=offset; y<=CANVAS_HEIGHT; y+=gridSize) { ctx.moveTo(0, y); ctx.lineTo(CANVAS_WIDTH, y); }
+    ctx.stroke();
 
-    if (enemies.some(e => e.fly)) {
-        const start = pathPoints[0];
-        const end = pathPoints[pathPoints.length - 1];
-        ctx.save();
+    // 2. Dynamic Wormhole Path
+    if (pathPoints.length > 0) {
+        ctx.lineCap = "round";
+        ctx.lineJoin = "round";
+
+        // Base Path (Dark "Trench")
+        ctx.lineWidth = 26; 
+        ctx.strokeStyle = "rgba(0,0,0,0.6)"; 
         ctx.beginPath();
-        ctx.moveTo(start.x, start.y);
-        ctx.lineTo(end.x, end.y);
-        
-        ctx.shadowBlur = 15;
-        ctx.shadowColor = "#9370DB"; 
-        ctx.lineWidth = 14;
-        ctx.strokeStyle = "rgba(75, 0, 130, 0.2)"; 
+        ctx.moveTo(pathPoints[0].x, pathPoints[0].y);
+        for(let i=1; i<pathPoints.length; i++) ctx.lineTo(pathPoints[i].x, pathPoints[i].y);
         ctx.stroke();
+
+        // Animated Spiral Wires
+        // We draw many small line segments to create the curve
+        const time = gameState.frames * 0.1;
+        const width = 8; // How wide the spiral opens
         
+        for(let i=0; i<pathPoints.length-1; i++) {
+            let p1 = pathPoints[i];
+            let p2 = pathPoints[i+1];
+            let dist = Math.hypot(p2.x - p1.x, p2.y - p1.y);
+            let angle = Math.atan2(p2.y - p1.y, p2.x - p1.x);
+            
+            // Draw segments along the line
+            let steps = Math.floor(dist / 4); // Resolution
+            
+            for(let s=0; s<steps; s++) {
+                let t = s/steps;
+                let tNext = (s+1)/steps;
+                
+                // Base coordinates on the line
+                let bx = p1.x + (p2.x - p1.x) * t;
+                let by = p1.y + (p2.y - p1.y) * t;
+                let bxNext = p1.x + (p2.x - p1.x) * tNext;
+                let byNext = p1.y + (p2.y - p1.y) * tNext;
+
+                // Spiral Offset Math
+                // We use sine waves offset by the angle of the line
+                let spiralPhase = (t * 20) - time; // Controls spin speed and density
+                
+                // Wire 1: Green
+                let offX = Math.cos(angle + Math.PI/2) * Math.sin(spiralPhase) * width;
+                let offY = Math.sin(angle + Math.PI/2) * Math.sin(spiralPhase) * width;
+                
+                let nextPhase = ((tNext) * 20) - time;
+                let offXNext = Math.cos(angle + Math.PI/2) * Math.sin(nextPhase) * width;
+                let offYNext = Math.sin(angle + Math.PI/2) * Math.sin(nextPhase) * width;
+                
+                ctx.beginPath();
+                ctx.strokeStyle = "#00ff00"; // Tech Green
+                ctx.lineWidth = 2;
+                ctx.moveTo(bx + offX, by + offY);
+                ctx.lineTo(bxNext + offXNext, byNext + offYNext);
+                ctx.stroke();
+
+                // Wire 2: Purple (Opposite Phase)
+                let offX2 = Math.cos(angle + Math.PI/2) * Math.sin(spiralPhase + Math.PI) * width;
+                let offY2 = Math.sin(angle + Math.PI/2) * Math.sin(spiralPhase + Math.PI) * width;
+                let offX2Next = Math.cos(angle + Math.PI/2) * Math.sin(nextPhase + Math.PI) * width;
+                let offY2Next = Math.sin(angle + Math.PI/2) * Math.sin(nextPhase + Math.PI) * width;
+
+                ctx.beginPath();
+                ctx.strokeStyle = "#bd00ff"; // Magic Purple
+                ctx.lineWidth = 2;
+                ctx.moveTo(bx + offX2, by + offY2);
+                ctx.lineTo(bxNext + offX2Next, byNext + offY2Next);
+                ctx.stroke();
+            }
+        }
+    }
+
+    // 3. Render Entities
+    mines.forEach(m => {
+        // Better Mine Visuals
+        ctx.fillStyle = (m.type === 'tech') ? '#ff4444' : '#00ffff';
+        ctx.shadowBlur = 10; ctx.shadowColor = ctx.fillStyle;
+        ctx.beginPath(); ctx.arc(m.x, m.y, 5, 0, Math.PI*2); ctx.fill();
+        
+        // Pulse ring
+        ctx.strokeStyle = ctx.fillStyle;
+        ctx.lineWidth = 1;
+        let pulse = (gameState.frames % 20) / 20 * 10;
+        ctx.beginPath(); ctx.arc(m.x, m.y, 5 + pulse, 0, Math.PI*2); ctx.stroke();
         ctx.shadowBlur = 0;
-        ctx.lineWidth = 3;
-        ctx.strokeStyle = "rgba(147, 112, 219, 0.8)"; 
-        ctx.setLineDash([15, 15]);
-        ctx.lineDashOffset = -gameState.frames * 3; 
-        ctx.stroke();
-        ctx.setLineDash([]);
+    });
+
+    towers.forEach(t => t.draw());
+    enemies.forEach(e => e.draw());
+    projectiles.forEach(p => p.draw());
+    particles.forEach(p => p.draw(ctx));
+    visualEffects.forEach(v => v.draw(ctx));
+
+    // Time Stop Overlay
+    if (gameState.freezeTimer > 0) {
+        ctx.fillStyle = "rgba(0, 255, 255, 0.1)";
+        ctx.fillRect(0,0,CANVAS_WIDTH, CANVAS_HEIGHT);
+        // Add "glitch" lines
+        if (Math.random() < 0.1) {
+            ctx.fillStyle = "rgba(255, 255, 255, 0.2)";
+            let y = Math.random() * CANVAS_HEIGHT;
+            ctx.fillRect(0, y, CANVAS_WIDTH, 2);
+        }
+    }
+
+    // Build Mode Ghost
+    if (buildMode || gameState.activeAbility === 'laser') {
+        ctx.save(); ctx.translate(mousePos.x, mousePos.y);
+        
+        if (gameState.activeAbility === 'laser') {
+            ctx.beginPath(); ctx.arc(0,0,60,0,Math.PI*2);
+            ctx.fillStyle = "rgba(255, 50, 50, 0.3)"; ctx.strokeStyle = "red";
+            ctx.fill(); ctx.stroke();
+        } else {
+            const type = TOWER_TYPES[buildMode];
+            const canAfford = gameState.money >= type.cost;
+            let range = type.range; // Base range
+            
+            ctx.beginPath(); ctx.arc(0, 0, range, 0, Math.PI * 2);
+            ctx.fillStyle = canAfford ? "rgba(255, 255, 255, 0.2)" : "rgba(255, 0, 0, 0.2)";
+            ctx.strokeStyle = canAfford ? "#fff" : "#f00";
+            ctx.fill(); ctx.stroke();
+            
+            // Draw Ghost Body
+            ctx.globalAlpha = 0.5; ctx.fillStyle = type.color;
+            ctx.beginPath(); ctx.arc(0,0, 10, 0, Math.PI*2); ctx.fill();
+        }
         ctx.restore();
     }
-}
-
-mines.forEach(m => {
-    ctx.fillStyle = (m.type === 'tech') ? '#ff0000' : '#00ffff';
-    ctx.beginPath(); ctx.arc(m.x, m.y, 4, 0, Math.PI*2); ctx.fill();
-});
-
-towers.forEach(t => t.draw());
-enemies.forEach(e => e.draw());
-projectiles.forEach(p => p.draw());
-particles.forEach(p => p.draw(ctx));
-visualEffects.forEach(v => v.draw(ctx));
-
-if (gameState.freezeTimer > 0) {
-    ctx.fillStyle = "rgba(0, 255, 255, 0.1)";
-    ctx.fillRect(0,0,CANVAS_WIDTH, CANVAS_HEIGHT);
-}
-
-if (buildMode || gameState.activeAbility === 'laser') {
-    ctx.save(); ctx.translate(mousePos.x, mousePos.y);
-    
-    if (gameState.activeAbility === 'laser') {
-        ctx.beginPath(); ctx.arc(0,0,60,0,Math.PI*2);
-        ctx.fillStyle = "rgba(255, 50, 50, 0.3)"; ctx.strokeStyle = "red";
-        ctx.fill(); ctx.stroke();
-    } else {
-        const type = TOWER_TYPES[buildMode];
-        let validPos = true;
-        // Check Path
-        for(let i=0; i<pathPoints.length-1; i++) {
-            const p1 = pathPoints[i]; const p2 = pathPoints[i+1];
-            const A = mousePos.x - p1.x; const B = mousePos.y - p1.y; const C = p2.x - p1.x; const D = p2.y - p1.y;
-            const dot = A * C + B * D; const lenSq = C * C + D * D;
-            let param = -1; if (lenSq != 0) param = dot / lenSq;
-            let xx, yy;
-            if (param < 0) { xx = p1.x; yy = p1.y; } else if (param > 1) { xx = p2.x; yy = p2.y; } else { xx = p1.x + param * C; yy = p1.y + param * D; }
-            const dx = mousePos.x - xx; const dy = mousePos.y - yy;
-            if (Math.hypot(dx, dy) < 30) validPos = false;
-        }
-        for(const t of towers) { if(Math.hypot(t.x - mousePos.x, t.y - mousePos.y) < 40) validPos = false; }
-
-        const canAfford = gameState.money >= type.cost;
-        
-        ctx.beginPath(); ctx.arc(0, 0, type.range, 0, Math.PI * 2);
-        if (validPos && canAfford) { ctx.fillStyle = "rgba(255, 255, 255, 0.2)"; ctx.strokeStyle = "rgba(255, 255, 255, 0.5)"; }
-        else { ctx.fillStyle = "rgba(255, 0, 0, 0.4)"; ctx.strokeStyle = "rgba(255, 0, 0, 0.8)"; }
-        ctx.fill(); ctx.stroke();
-        
-        // Draw Ghost Body
-        ctx.globalAlpha = 0.5; ctx.fillStyle = type.color;
-        ctx.beginPath(); ctx.arc(0,0, 10, 0, Math.PI*2); ctx.fill();
-    }
-    ctx.restore();
-}
 }
 
 function gameLoop() {
