@@ -213,39 +213,78 @@ canvas {
 
 /* Modals */
 #upgrade-modal {
-    width: 300px; /* Reduced width */
-    padding: 10px; /* Reduced padding */
+    /* Overlay positioning */
+    position: absolute; 
     bottom: 10px;
     right: 10px;
-    left: auto;
-    top: auto;
-    transform: none;
-    font-size: 0.9em; /* Slightly smaller text */
+    z-index: 100; /* Ensures it sits ON TOP of the canvas */
+    
+    /* Size and Appearance */
+    display: none; /* Hidden by default, toggled by JS */
+    flex-direction: column;
+    width: 260px; /* Much narrower */
+    padding: 10px;
+    background: rgba(10, 15, 20, 0.95); /* Dark semi-transparent background */
     border: 1px solid #444;
-    background: rgba(20, 20, 25, 0.95);
-    box-shadow: 0 0 15px rgba(0,0,0,0.8);
-    z-index: 1000;
+    border-radius: 8px;
+    color: #fff;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 12px; /* Smaller text */
+    box-shadow: 0 0 10px rgba(0,0,0,0.5);
 }
 
+/* Make the title smaller and tighter */
 #upgrade-modal h3 {
-    margin: 5px 0;
-    font-size: 1.1em;
+    margin: 0 0 8px 0;
+    font-size: 14px;
+    color: #00f3ff;
+    text-transform: uppercase;
+    border-bottom: 1px solid #333;
+    padding-bottom: 5px;
 }
 
-#upgrade-modal .upgrade-row {
-    margin-bottom: 5px;
+/* Compact the rows */
+.upgrade-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 5px;
+    border-radius: 4px;
 }
 
+/* Style the buttons to be small */
 #upgrade-modal button {
     padding: 4px 8px;
-    font-size: 0.85em;
+    font-size: 11px;
+    background: #333;
+    border: 1px solid #555;
+    color: #fff;
+    cursor: pointer;
+    transition: all 0.2s;
 }
 
-/* Ensure close button is visible */
-#upgrade-modal .close-btn {
+#upgrade-modal button:hover:not(:disabled) {
+    background: #00f3ff;
+    color: #000;
+}
+
+#upgrade-modal button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Style the close button */
+#close-upgrade-btn {
+    position: absolute;
     top: 5px;
-    right: 10px;
-    font-size: 1.2em;
+    right: 8px;
+    background: none;
+    border: none;
+    color: #ff4444;
+    font-weight: bold;
+    font-size: 16px;
     cursor: pointer;
 }
 
