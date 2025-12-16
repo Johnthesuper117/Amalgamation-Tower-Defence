@@ -224,71 +224,190 @@
             bottom: 20px;
             left: 50%;
             transform: translateX(-50%);
-            width: 500px;
+            width: 400px;
             background: rgba(22, 27, 34, 0.98);
             border: 1px solid #30363d;
-            padding: 15px;
+            padding: 10px;
             border-radius: 8px;
             display: none;
             flex-direction: column;
-            gap: 10px;
+            gap: 8px;
             z-index: 100;
             backdrop-filter: blur(10px);
             box-shadow: 0 10px 30px rgba(0,0,0,0.8);
         }
 
-        .upgrade-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #444; padding-bottom: 5px; }
-        .upgrade-paths { display: flex; gap: 10px; }
-        .path-column { flex: 1; background: rgba(0, 0, 0, 0.3); padding: 10px; border-radius: 4px; border: 1px solid #333; position: relative; }
+        .upgrade-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #444;
+            padding-bottom: 5px;
+        }
+        .upgrade-paths {
+            display: flex;
+            gap: 5px;
+            overflow-x: auto;
+            max-height: 200px;
+        }
+        .path-column {
+            flex: 1;
+            min-width: 150px;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid #333;
+            position: relative;
+        }
         .path-tech { border-color: rgba(0, 243, 255, 0.3); }
         .path-magic { border-color: rgba(189, 0, 255, 0.3); }
-        .path-title { font-size: 12px; text-transform: uppercase; margin-bottom: 8px; text-align: center; }
+        .path-title {
+            font-size: 10px;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+            text-align: center;
+        }
         .path-tech .path-title { color: var(--accent-tech); }
         .path-magic .path-title { color: var(--accent-magic); }
-        .path-key-hint { position: absolute; top: 5px; right: 5px; font-size: 10px; color: #666; font-weight: bold; border: 1px solid #444; padding: 1px 3px; border-radius: 3px; }
+        .path-key-hint {
+            position: absolute;
+            top: 3px;
+            right: 3px;
+            font-size: 8px;
+            color: #666;
+            font-weight: bold;
+            border: 1px solid #444;
+            padding: 1px 2px;
+            border-radius: 3px;
+        }
         
         .upgrade-btn {
-            width: 100%; padding: 8px; background: #21262d; border: 1px solid #30363d;
-            color: white; cursor: pointer; border-radius: 4px; margin-top: 5px; font-size: 12px;
+            width: 100%;
+            padding: 5px 8px;
+            background: #21262d;
+            border: 1px solid #30363d;
+            color: white;
+            cursor: pointer;
+            border-radius: 4px;
+            margin-top: 3px;
+            font-size: 10px;
         }
         .upgrade-btn:hover:not(:disabled) { background: #30363d; }
         .upgrade-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-        .sell-btn { background: #3d1c1c; border: 1px solid #ff4444; color: #ffaaaa; margin-top: 10px; }
-        
-        #priority-btn {
-            background: #238636; border: 1px solid #2ea043; margin-left: 10px;
-            font-size: 11px; padding: 4px 8px; border-radius: 4px; color: white; cursor: pointer;
+        .sell-btn { 
+            background: #3d1c1c; 
+            border: 1px solid #ff4444; 
+            color: #ffaaaa; 
+            margin-top: 10px;
+            padding: 5px 8px;
         }
         
-        #dps-display { color: #f0f6fc; font-size: 12px; margin-left: 10px; }
+        #priority-btn {
+            background: #238636; 
+            border: 1px solid #2ea043; 
+            margin-left: 10px;
+            font-size: 11px; 
+            padding: 4px 8px; 
+            border-radius: 4px; 
+            color: white; 
+            cursor: pointer;
+        }
+        
+        #dps-display { 
+            color: #f0f6fc; 
+            font-size: 12px; 
+            margin-left: 10px; 
+        }
 
         /* Fullscreen Overlays */
         #map-screen, #game-over, #level-complete {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%;
             background: rgba(13, 17, 23, 0.95);
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center;
             z-index: 200;
         }
-        #game-over { display: none; }
-        #level-complete { display: none; }
-
-        .map-grid { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; max-width: 900px; }
-        .map-card {
-            width: 200px; height: 160px; background: #161b22; border: 1px solid #30363d;
-            border-radius: 8px; cursor: pointer; padding: 15px;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            transition: 0.3s; position: relative;
+        #game-over { 
+            display: none; 
         }
-        .map-card:hover:not(.locked) { transform: translateY(-5px); border-color: var(--accent-tech); box-shadow: 0 5px 15px rgba(0, 243, 255, 0.2); }
-        .map-card.locked { opacity: 0.5; cursor: not-allowed; border-color: #3d1c1c; }
-        .map-name { font-size: 18px; font-weight: bold; margin-bottom: 5px; color: #fff; text-align: center; }
-        .map-diff { font-size: 12px; color: #8b949e; margin-bottom: 5px; }
-        .map-preview { width: 100%; height: 60px; background: #0d1117; margin-top: 10px; border-radius: 4px; opacity: 0.5; }
-        .lock-icon { font-size: 24px; color: #8b949e; margin-top: 10px; }
-        
-        h1 { margin: 0 0 20px 0; text-shadow: 0 0 10px var(--accent-magic); font-size: 32px; }
-        .modal-buttons { display: flex; gap: 20px; margin-top: 20px; }
+        #level-complete { 
+            display: none; 
+        }
 
+        .map-grid { 
+            display: flex; 
+            gap: 20px; 
+            flex-wrap: wrap; 
+            justify-content: center; 
+            max-width: 900px; 
+        }
+        .map-card {
+            width: 200px; 
+            height: 160px; 
+            background: #161b22; 
+            border: 1px solid #30363d;
+            border-radius: 8px; 
+            cursor: pointer; 
+            padding: 15px;
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center;
+            transition: 0.3s; 
+            position: relative;
+        }
+        .map-card:hover:not(.locked) { 
+            transform: translateY(-5px); 
+            border-color: var(--accent-tech); 
+            box-shadow: 0 5px 15px rgba(0, 243, 255, 0.2); 
+        }
+        .map-card.locked { 
+            opacity: 0.5; 
+            cursor: not-allowed; 
+            border-color: #3d1c1c; 
+        }
+        .map-name { 
+            font-size: 18px; 
+            font-weight: bold; 
+            margin-bottom: 5px; 
+            color: #fff; 
+            text-align: center; 
+        }
+        .map-diff { 
+            font-size: 12px; 
+            color: #8b949e; 
+            margin-bottom: 5px; 
+        }
+        .map-preview { 
+            width: 100%; 
+            height: 60px; 
+            background: #0d1117; 
+            margin-top: 10px; 
+            border-radius: 4px; 
+            opacity: 0.5; 
+        }
+        .lock-icon { 
+            font-size: 24px; 
+            color: #8b949e; 
+            margin-top: 10px; 
+        }
+        
+        h1 { 
+            margin: 0 0 20px 0; 
+            text-shadow: 0 0 10px var(--accent-magic); 
+            font-size: 32px; 
+        }
+        .modal-buttons { 
+            display: flex; 
+            gap: 20px; 
+            margin-top: 20px; 
+        }
     </style>
 </head>
 <body>
@@ -334,13 +453,13 @@
                     <div class="path-column path-tech">
                         <span class="path-key-hint">[Q]</span>
                         <div class="path-title">Science / Tech</div>
-                        <div id="path-1-desc" style="font-size: 11px; height: 30px; margin-bottom: 5px;">Upgrade Desc</div>
+                        <div id="path-1-desc" style="font-size: 10px; height: 30px; margin-bottom: 5px;">Upgrade Desc</div>
                         <button id="btn-upgrade-1" class="upgrade-btn" onclick="buyUpgrade(1)">Upgrade (Ψ <span id="cost-1">0</span>)</button>
                     </div>
                     <div class="path-column path-magic">
                         <span class="path-key-hint">[E]</span>
                         <div class="path-title">Arcane / Magic</div>
-                        <div id="path-2-desc" style="font-size: 11px; height: 30px; margin-bottom: 5px;">Upgrade Desc</div>
+                        <div id="path-2-desc" style="font-size: 10px; height: 30px; margin-bottom: 5px;">Upgrade Desc</div>
                         <button id="btn-upgrade-2" class="upgrade-btn" onclick="buyUpgrade(2)">Upgrade (Ψ <span id="cost-2">0</span>)</button>
                     </div>
                 </div>
@@ -461,7 +580,7 @@ const Sound = {
             gain.gain.setValueAtTime(0.1, now); gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
             osc.start(now); osc.stop(now + 0.3);
         } else if (type === 'laser') {
-            osc.type = 'sawtooth'; osc.frequency.setValueAtTime(200, now);
+            osc.type = 'sawtooth'; osc.frequency.setValueAtTime(200, now); osc.frequency.exponentialRampToValueAtTime(10, now + 0.5);
             gain.gain.setValueAtTime(0.2, now); gain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
             osc.start(now); osc.stop(now + 0.5);
         } else if (type === 'freeze') {
@@ -603,7 +722,7 @@ class VisualEffect {
             ctx.translate(this.x, this.y); ctx.rotate(this.angle);
             const grad = ctx.createRadialGradient(0, 0, 0, 0, 0, this.radius);
             grad.addColorStop(0, this.color); grad.addColorStop(1, 'rgba(0,0,0,0)');
-            ctx.fillStyle = grad; ctx.beginPath(); ctx.moveTo(0, 0); ctx.arc(0, 0, this.radius, -Math.PI/6, Math.PI/6); ctx.closePath(); ctx.fill();
+            ctx.fillStyle = grad; ctx.beginPath(); ctx.arc(0, 0, this.radius, -Math.PI/6, Math.PI/6); ctx.closePath(); ctx.fill();
         }
         else if (this.type === 'explosion') {
             const r = this.radius * (1 - alpha) * 2; 
@@ -730,7 +849,9 @@ class Tower {
         this.cooldown = 0; this.color = type.color; this.shape = type.shape;
         this.projectileSpeed = type.projectileSpeed || 0;
         this.path = 0; this.level = 0; this.angle = 0; this.buffSpeedMultiplier = 1.0;
-        this.buffDamageMultiplier = 1.0; this.buffRangeMultiplier = 1.0; this.buffCostMultiplier = 1.0;
+        this.buffDamageMultiplier = 1.0;
+        this.buffRangeMultiplier = 1.0;
+        this.buffCostMultiplier = 1.0;
         this.priority = 'first'; 
         this.currentTarget = null;
         this.totalDamage = 0; 
@@ -760,9 +881,15 @@ class Tower {
     }
 
     act() {
-        if (gameState.freezeTimer > 0) return; 
-
-        let cd = this.cooldownMax / this.buffSpeedMultiplier;
+        if (gameState.freezeTimer > 0) {
+            // Calculate reduced speed during time freeze
+            const speedMultiplier = 0.5;
+            this.cooldownMax = this.cooldownMax / (speedMultiplier * this.buffSpeedMultiplier);
+        } else {
+            this.cooldownMax = this.cooldownMax / this.buffSpeedMultiplier;
+        }
+        
+        let cd = this.cooldownMax;
         this.currentTarget = null;
 
         if (this.type === 'pylon') {
@@ -935,7 +1062,7 @@ class Tower {
             if (this.path === 1 && this.level >= 3) gain += Math.floor(gameState.money * 0.1);
             if (this.path === 1 && this.level >= 5) gain += Math.floor(gameState.money * 0.2); 
             gameState.money += gain;
-            particles.push(new Particle(this.x, this.y, '#ffd700', 5, 40));
+            particles.push(new Particle(this.x, this.y, "#ffd700", 5, 40));
         }
     }
     chainLightning(target, bounces, dmg) {
@@ -953,7 +1080,7 @@ class Tower {
                 let t = i/steps;
                 pts.push({
                     x: target.x + (nextTarget.x - target.x)*t + (Math.random()-0.5)*20,
-                    y: target.y + (nextTarget.y - target.y)*t + (Math.random()-0.5)*20
+                    y: target.y + (nextTarget.y - target.x)*t + (Math.random()-0.5)*20
                 });
             }
             pts.push({x:nextTarget.x, y:nextTarget.y});
@@ -1009,7 +1136,7 @@ class Tower {
 
         if (this.shape === 'square') { ctx.fillRect(-10, -10, 20, 20); ctx.fillStyle = "#000"; ctx.fillRect(-4, -4, 8, 8); }
         else if (this.shape === 'triangle') { ctx.beginPath(); ctx.moveTo(15, 0); ctx.lineTo(-10, 10); ctx.lineTo(-10, -10); ctx.fill(); ctx.beginPath(); ctx.moveTo(5, 0); ctx.lineTo(-5, 5); ctx.lineTo(-5, -5); ctx.fillStyle = "#000"; ctx.fill(); }
-        else if (this.shape === 'circle') { ctx.beginPath(); ctx.arc(0, 0, 12, 0, Math.PI * 2); ctx.fill(); ctx.beginPath(); ctx.arc(0, 0, 6, 0, Math.PI * 2); ctx.fillStyle = "#000"; ctx.fill(); }
+        else if (this.shape === 'circle') { ctx.beginPath(); ctx.arc(0, 0, 12, 0, Math.PI * 2); ctx.fill(); ctx.beginPath(); ctx.arc(0, 0, 6, 0, Math.PI * 2); ctx.fill(); }
         else if (this.shape === 'orb') { 
             ctx.beginPath(); ctx.arc(0, 0, 10, 0, Math.PI * 2); ctx.fillStyle = this.color; ctx.fill();
             ctx.globalAlpha = 0.5; ctx.beginPath(); ctx.arc(0, 0, 12 + Math.sin(gameState.frames*0.1)*2, 0, Math.PI * 2); ctx.stroke(); ctx.globalAlpha = 1.0;
@@ -1121,7 +1248,7 @@ class Projectile {
             }
             if (this.pierce > 0) {
                 this.pierce--;
-                if(this.pierce <= 0) this.active = false;
+                if (!this.active) break;
             } else {
                 this.active = false;
             }
@@ -1155,16 +1282,6 @@ class Projectile {
                     t.takeDamage(this.damage, this.sourceTower);
                 } else {
                     t.takeDamage(this.damage, this.sourceTower);
-                }
-                if (this.pierce > 0) { 
-                    this.pierce--; 
-                    this.active = true; 
-                    // For homing projectiles, pierce is tricky. Usually implies finding a new target behind.
-                    // Simplified: It stays active but needs to find a new target? 
-                    // Current logic just lets it linger at same spot, which isn't great.
-                    // For now, let's keep pierce behavior mainly for Lance and Sentry (if linear)
-                } else {
-                    this.active = false;
                 }
             }
         }
@@ -1335,7 +1452,15 @@ function updateUpgradeMenu() {
         const cost = Math.floor(upg.cost * discountMult);
         document.getElementById('path-1-desc').innerText = upg.name + ": " + upg.desc;
         document.getElementById('cost-1').innerText = cost;
-        if (gameState.money >= cost) p1Btn.disabled = false;
+        if (gameState.money >= cost) {
+            p1Btn.style.background = '#00f3ff';
+            p1Btn.style.border = '1px solid #00a8f3';
+            p1Btn.disabled = false;
+        } else {
+            p1Btn.style.background = '#30363d';
+            p1Btn.style.border = '1px solid #8b949e';
+            p1Btn.disabled = true;
+        }
     } else { document.getElementById('path-1-desc').innerText = "Path Locked"; }
 
     if (selectedTower.path === 0 || selectedTower.path === 2) {
@@ -1343,7 +1468,15 @@ function updateUpgradeMenu() {
         const cost = Math.floor(upg.cost * discountMult);
         document.getElementById('path-2-desc').innerText = upg.name + ": " + upg.desc;
         document.getElementById('cost-2').innerText = cost;
-        if (gameState.money >= cost) p2Btn.disabled = false;
+        if (gameState.money >= cost) {
+            p2Btn.style.background = '#bd00ff';
+            p2Btn.style.border = '1px solid #8b3f7b';
+            p2Btn.disabled = false;
+        } else {
+            p2Btn.style.background = '#30363d';
+            p2Btn.style.border = '1px solid #8b949e';
+            p2Btn.disabled = true;
+        }
     } else { document.getElementById('path-2-desc').innerText = "Path Locked"; }
 }
 
@@ -1436,7 +1569,8 @@ function continueEndless() {
 }
 
 canvas.addEventListener('mousemove', (e) => {
-    const rect = canvas.getBoundingClientRect(); mousePos.x = e.clientX - rect.left; mousePos.y = e.clientY - rect.top;
+    const rect = canvas.getBoundingClientRect();
+    mousePos.x = e.clientX - rect.left; mousePos.y = e.clientY - rect.top;
 });
 
 canvas.addEventListener('mousedown', (e) => {

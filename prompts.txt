@@ -1,0 +1,7 @@
+Make the tower upgrades popup smaller so it doesn't cover up as much. Then make it so that it updates whether you have enough money to get an upgrade so you don't have to refresh the popup. 
+Allow the towers to act at .5 speed during Time Stop instead of completely stopping.
+Make stronger enemies give more money and deal more damage. 
+
+Test the game and fix any bugs/errors/glitches you find.
+Make sure to not forget anything from the original file here:
+
