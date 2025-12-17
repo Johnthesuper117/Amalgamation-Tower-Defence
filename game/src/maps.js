@@ -1,6 +1,0 @@
-export const MAPS = [
-{ name: "Sector Alpha", diffName: "Normal", points: [{x: 0, y: 100}, {x: 200, y: 100}, {x: 200, y: 400}, {x: 400, y: 400}, {x: 400, y: 200}, {x: 700, y: 200}, {x: 700, y: 500}, {x: 900, y: 500}, {x: 900, y: 300}, {x: 1000, y: 300}], difficultyMod: 1.0, waveLimit: 50, color: "#00f3ff", previewStyle: "background: linear-gradient(45deg, transparent 45%, #00f3ff 45%, #00f3ff 55%, transparent 55%);" },
-{ name: "The Canyon", diffName: "Hard", points: [{x: 0, y: 150}, {x: 800, y: 150}, {x: 800, y: 450}, {x: 200, y: 450}, {x: 200, y: 300}, {x: 1000, y: 300}], difficultyMod: 1.2, waveLimit: 75, color: "#bd00ff", previewStyle: "background: linear-gradient(90deg, transparent 45%, #bd00ff 45%, #bd00ff 55%, transparent 55%);" },
-{ name: "Void Spiral", diffName: "Expert", points: [{x: 500, y: 0}, {x: 500, y: 200}, {x: 700, y: 200}, {x: 700, y: 400}, {x: 300, y: 400}, {x: 300, y: 300}, {x: 500, y: 300}, {x: 500, y: 600}], difficultyMod: 1.5, waveLimit: 100, color: "#ffd700", previewStyle: "border-radius: 50%; border: 2px solid #ffd700;" },
-{ name: "Zig-Zag Zone", diffName: "Chaos", points: [{x:0,y:50}, {x:200,y:550}, {x:400,y:50}, {x:600,y:550}, {x:800,y:50}, {x:1000,y:550}], difficultyMod: 1.8, waveLimit: 125, color: "#ff4444", previewStyle: "background: repeating-linear-gradient(45deg, #333, #333 10px, #444 10px, #444 20px);" }
-];
