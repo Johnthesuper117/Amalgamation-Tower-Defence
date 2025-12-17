@@ -193,6 +193,25 @@ draw(ctx) {
         ctx.fillStyle = '#fff'; ctx.fillRect(this.x-5, 0, 10, this.y);
         ctx.fillStyle = 'rgba(0, 243, 255, 0.5)'; ctx.beginPath(); ctx.arc(this.x, this.y, 60, 0, Math.PI*2); ctx.fill();
     }
+    else if (this.type === 'beam') {
+        ctx.strokeStyle = this.color;
+        ctx.lineWidth = this.width || 4;
+        ctx.shadowBlur = 15;
+        ctx.shadowColor = this.color;
+        
+        ctx.beginPath();
+        ctx.moveTo(this.x, this.y);
+        ctx.lineTo(this.targetX, this.targetY);
+        ctx.stroke();
+        
+        // Inner glow
+        ctx.globalAlpha = alpha * 0.6;
+        ctx.lineWidth = (this.width || 4) * 0.5;
+        ctx.strokeStyle = '#ffffff';
+        ctx.stroke();
+        
+        ctx.shadowBlur = 0;
+    }
     ctx.restore();
 }
 }
