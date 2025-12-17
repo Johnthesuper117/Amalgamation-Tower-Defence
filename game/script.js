@@ -38,6 +38,14 @@ play: (type) => {
         osc.type = 'triangle'; osc.frequency.setValueAtTime(1000, now); osc.frequency.linearRampToValueAtTime(100, now + 1.0);
         gain.gain.setValueAtTime(0.1, now); gain.gain.linearRampToValueAtTime(0.001, now + 1.0);
         osc.start(now); osc.stop(now + 1.0);
+    } else if (type === 'prism') {
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(600, now);
+        osc.frequency.exponentialRampToValueAtTime(300, now + 0.15);
+        gain.gain.setValueAtTime(0.06, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+        osc.start(now);
+        osc.stop(now + 0.15);
     }
 }
 };
@@ -62,7 +70,8 @@ const ENEMIES = {
     centurion: { hp: 1000, speed: 1.2, color: "#FF8C00", reward: 150, damage: 25, radius: 18, name: "Flux Centurion", shape: "star_6", resistance: "physical" }, 
     boss: { hp: 3000, speed: 0.6, color: "#bd00ff", reward: 500, damage: 50, radius: 25, name: "Void Titan", shape: "skull", resistance: "none" }, 
     titan_mk2: { hp: 10000, speed: 0.4, color: "#fff", reward: 2000, damage: 100, radius: 35, name: "Omega Titan", shape: "omega", resistance: "all" },
-    flyer: { hp: 80, speed: 3.0, color: "#FF4500", reward: 25, damage: 3, radius: 9, name: "Wrinkling", shape: "wing", resistance: "none", fly: true }
+    flyer: { hp: 80, speed: 3.0, color: "#FF4500", reward: 25, damage: 3, radius: 9, name: "Wrinkling", shape: "wing", resistance: "none", fly: true },
+    shield: { hp: 140, speed: 1.5, color: "#C0C0C0", reward: 35, damage: 4, radius: 15, name: "Shielded Mech", shape: "square", resistance: "energy" }
 };
 
 const TOWER_TYPES = {
@@ -685,8 +694,8 @@ draw() {
     // Level Dots
     ctx.fillStyle = "#fff";
     const dotStart = -((this.level-1) * 3);
-    for(let i=0; i<this.level; i++) { 
-        ctx.beginPath(); ctx.arc(dotStart + (i*6), 18, 1.5, 0, Math.PI*2); ctx.fill(); 
+    for(let i=0; i<this.level; i++) {
+        ctx.beginPath(); ctx.arc(dotStart + (i*6), 18, 1.5, 0, Math.PI*2); ctx.fill();
     }
 
     ctx.restore();
@@ -892,10 +901,10 @@ if (type === 'laser') {
 function useActiveAbility(x, y) {
 if (gameState.activeAbility === 'laser') {
     visualEffects.push(new VisualEffect('laser_orbit', x, y, { life: 30 }));
-    Sound.play('explosion'); 
+    Sound.play('explosion');
     enemies.forEach(e => {
         if (Math.hypot(e.x - x, e.y - y) < 60) {
-            e.takeDamage(500, null); 
+            e.takeDamage(e.maxHp * 0.1, null);
         }
     });
     gameState.abilities.laser.cd = gameState.abilities.laser.maxCd;

@@ -1,9 +1,2 @@
-Improve the visuals, the towers and enemies are kinda plain, so I want their designs to be more detailed and visually appealing. 
-For the tech wires and magic runes visuals, make them smaller so you can still identify the tower type while it still being visable. 
-Make the wormhole path more dynamic, with rotating green and purple spiral wire starting at one end and ending at the other end instead of the dotted line.
-Make the background of the maps more vibrant and detailed, adding elements that fit the theme of each level while combining the tech and magic crossover theme.
-Make the constructs shop menu on the right go from the top to bottom, and not be restricted by the header and footer bar, so the player doesn't have to scroll down to see all the towers. 
-Make sure the towers range bubbles are updated when a tower gets upgraded or buffed. 
-
 
 Test the game and fix any bugs/errors/glitches you find.
