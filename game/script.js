@@ -488,13 +488,32 @@ shoot(target, dmg) {
     Sound.play((this.type==='prism' || this.path===2) ? 'shoot_magic' : 'shoot_tech');
     if (this.type === 'prism') {
         let d = dmg * (1 + this.level);
-        if (this.path === 1 && this.level >= 1) d *= 2; if (this.path === 1 && this.level >= 5) d *= 5; 
+
+        if (this.path === 1 && this.level >= 1) d *= 2;
+        if (this.path === 1 && this.level >= 5) d *= 5;
+
+        // Apply damage
         target.takeDamage(d, this);
-        if (this.path === 2 && this.level >= 1) target.slowTimer = 5; 
-        if (this.path === 2 && this.level >= 5) target.hp = 0; 
-        if (this.path === 2 && this.level >= 2) this.chainLightning(target, 2, d); 
+
+        // Prism slows / kills (your original logic)
+        if (this.path === 2 && this.level >= 1) target.slowTimer = 5;
+        if (this.path === 2 && this.level >= 5) target.hp = 0;
+        if (this.path === 2 && this.level >= 2) this.chainLightning(target, 2, d);
+
+        // --- NEW BEAM VISUAL ---
+        visualEffects.push(
+            new VisualEffect("beam", this.x, this.y, {
+                targetX: target.x,
+                targetY: target.y,
+                width: 4,
+                color: this.path === 2 ? "#bd00ff" : "#00f3ff",
+                life: 4
+            })
+        );
+
         return;
-    }
+}
+
     if (this.type === 'coil') {
         this.chainLightning(target, 2 + this.level, dmg); 
         let pts = [{x:this.x, y:this.y}];
@@ -832,6 +851,19 @@ draw() {
         ctx.fillStyle = "#A020F0"; 
         ctx.save(); ctx.translate(this.x, this.y); ctx.rotate(Math.atan2(this.vy, this.vx)); 
         ctx.fillRect(-6, -1, 12, 2); ctx.restore();
+    }
+    else if (this.type === "beam") {
+        ctx.strokeStyle = this.color;
+        ctx.lineWidth = this.width;
+        ctx.shadowBlur = 10;
+        ctx.shadowColor = this.color;
+
+        ctx.beginPath();
+        ctx.moveTo(this.x, this.y);
+        ctx.lineTo(this.targetX, this.targetY);
+        ctx.stroke();
+
+        ctx.shadowBlur = 0;
     }
     else { ctx.fillStyle = "#00f3ff"; ctx.arc(this.x, this.y, 3, 0, Math.PI * 2); }
     ctx.fill();

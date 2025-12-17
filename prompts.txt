@@ -1,2 +1,3 @@
+The Aether Prism Tower's Beam projectile won't show, please fix this error. 
 
 Test the game and fix any bugs/errors/glitches you find.
