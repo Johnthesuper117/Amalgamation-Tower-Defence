@@ -7,6 +7,13 @@ const C_PATH_BORDER = "#30363d";
 const C_RANGE = "rgba(255, 255, 255, 0.1)";
 const C_RANGE_BORDER = "rgba(255, 255, 255, 0.3)";
 
+const EXPOSE_DAMAGE_MULTIPLIER = 1.16;
+const EXPOSE_DURATION_FRAMES = 90;
+const SINGULARITY_STUN_FRAMES = 20;
+const ACID_POOL_BASE_RADIUS = 48;
+const ACID_POOL_BASE_LIFE = 260;
+const ACID_POOL_TICK_RATE = 22;
+
 let audioCtx;
 const Sound = {
 init: () => { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); },
@@ -76,14 +83,14 @@ const ENEMIES = {
 
 const TOWER_TYPES = {
 miner: { name: "Data-Mine", cost: 160, range: 0, damage: 0, cooldown: 0, color: "#4CAF50", shape: "square", type: "none", desc: "Generates Ψ 15 per wave.", upgrades: { path1: [{ name: "Overclock", cost: 120, desc: "+10 Cash" }, { name: "Crypto Farm", cost: 340, desc: "+25 Cash" }, { name: "Blockchain AI", cost: 900, desc: "+10% Interest" }, { name: "Server Farm", cost: 2400, desc: "+150 Cash" }, { name: "Quantum Market", cost: 6500, desc: "+20% Interest" }], path2: [{ name: "Alchemy", cost: 180, desc: "Kill Cash +1" }, { name: "Transmute", cost: 450, desc: "+40 Cash" }, { name: "Philosopher Stone", cost: 1100, desc: "+100 Cash" }, { name: "Golden Age", cost: 2900, desc: "Base Gen x2" }, { name: "Midas Curse", cost: 7000, desc: "Kill Cash +5" }] } },
-sentry: { name: "Quantum Sentry", cost: 260, range: 125, damage: 11, cooldown: 32, color: "#00a8f3", shape: "square", projectileSpeed: 8, type: "physical", desc: "Rapid fire kinetic.", upgrades: { path1: [{ name: "Accelerator", cost: 170, desc: "Faster Fire" }, { name: "Pierce", cost: 450, desc: "Hits 2 targets" }, { name: "Railgun", cost: 1300, desc: "Fast & High Dmg" }, { name: "Gatling", cost: 2900, desc: "Insane Fire Rate" }, { name: "Death Ray", cost: 7600, desc: "Instant Hit Beam" }], path2: [{ name: "Rune Carving", cost: 170, desc: "+5 Damage" }, { name: "Seeking", cost: 400, desc: "Auto-aim" }, { name: "Multi-Shot", cost: 1150, desc: "Fires 3 bolts" }, { name: "Spell Weaver", cost: 2500, desc: "Double Projectiles" }, { name: "Eldritch Blast", cost: 7000, desc: "Explosive Magic" }] } },
+sentry: { name: "Quantum Sentry", cost: 260, range: 125, damage: 11, cooldown: 32, color: "#00a8f3", shape: "square", projectileSpeed: 8, type: "physical", desc: "Rapid fire kinetic.", upgrades: { path1: [{ name: "Accelerator", cost: 170, desc: "Faster Fire" }, { name: "Pierce", cost: 450, desc: "Hits 2 targets" }, { name: "Railgun", cost: 1300, desc: "Fast & High Dmg" }, { name: "Gatling", cost: 2900, desc: "Insane Fire Rate" }, { name: "Death Ray", cost: 7600, desc: "Instant Hit Beam" }], path2: [{ name: "Rune Carving", cost: 170, desc: "+5 Damage" }, { name: "Fracture Rounds", cost: 400, desc: "Marks for +damage" }, { name: "Multi-Shot", cost: 1150, desc: "Fires 3 bolts" }, { name: "Spell Weaver", cost: 2500, desc: "Double Projectiles" }, { name: "Eldritch Blast", cost: 7000, desc: "Explosive Magic" }] } },
 vent: { name: "Flux Vent", cost: 280, range: 90, damage: 1.2, cooldown: 7, color: "#FF4500", shape: "triangle", projectileSpeed: 0, type: "energy", desc: "Short range AoE spray.", upgrades: { path1: [{ name: "High Pressure", cost: 220, desc: "+Range" }, { name: "Plasma Fire", cost: 520, desc: "+Damage" }, { name: "Blue Flame", cost: 1300, desc: "Melts Armor" }, { name: "Fusion Core", cost: 3000, desc: "Massive Cone" }, { name: "Solar Wind", cost: 6800, desc: "Global DoT Aura" }], path2: [{ name: "Cursed Fumes", cost: 260, desc: "Slows enemies" }, { name: "Hex Cloud", cost: 620, desc: "Reduces Dmg Dealt" }, { name: "Soul Burn", cost: 1400, desc: "% Max HP Dmg" }, { name: "Terror", cost: 3200, desc: "Stuns briefly" }, { name: "Nether Rift", cost: 7200, desc: "Insta-kill low HP" }] } },
 coil: { name: "Tesla Coil", cost: 430, range: 135, damage: 18, cooldown: 48, color: "#00FFFF", shape: "circle", projectileSpeed: 0, type: "energy", desc: "Chains lightning.", upgrades: { path1: [{ name: "High Voltage", cost: 280, desc: "+Damage" }, { name: "Capacitor", cost: 620, desc: "More Chains" }, { name: "Overload", cost: 1500, desc: "Fast Fire Rate" }, { name: "Arc Reactor", cost: 3400, desc: "Chains Unlimited" }, { name: "Thunder God", cost: 8200, desc: "Screen Wipe Zap" }], path2: [{ name: "Static", cost: 320, desc: "Slows targets" }, { name: "Shock", cost: 700, desc: "Stuns targets" }, { name: "Chain Reaction", cost: 1700, desc: "Explodes on death" }, { name: "Storm Caller", cost: 3600, desc: "Strikes randoms" }, { name: "Zeus's Wrath", cost: 8500, desc: "Massive AoE Stun" }] } },
 fabricator: { name: "Fabricator", cost: 520, range: 105, damage: 38, cooldown: 95, color: "#808080", shape: "square", projectileSpeed: 0, type: "physical", desc: "Places mines on track.", upgrades: { path1: [{ name: "Proximity", cost: 340, desc: "Wider Trigger" }, { name: "Cluster Mine", cost: 750, desc: "Spawns 3 mines" }, { name: "High Explosive", cost: 1800, desc: "Huge Damage" }, { name: "Smart Mines", cost: 4100, desc: "Seek enemies" }, { name: "Nuke Layer", cost: 9000, desc: "Nuclear Mines" }], path2: [{ name: "Rune Trap", cost: 380, desc: "Magic Dmg" }, { name: "Frost Glyph", cost: 820, desc: "Freezes enemies" }, { name: "Gravity Sigil", cost: 1900, desc: "Sucks enemies in" }, { name: "Void Gate", cost: 4500, desc: "Teleports enemy back" }, { name: "Dimensional Rift", cost: 9800, desc: "Removes enemy" }] } },
-pylon: { name: "Chrono-Pylon", cost: 320, range: 100, damage: 0, cooldown: 0, color: "#ffffff", shape: "circle", type: "none", desc: "Buffs towers.", upgrades: { path1: [{ name: "Network Hub", cost: 220, desc: "+Range" }, { name: "Signal Boost", cost: 500, desc: "Stronger Buff" }, { name: "Global Uplink", cost: 1700, desc: "Global Buff" }, { name: "Overclock", cost: 3800, desc: "+Dmg Buff" }, { name: "Command Center", cost: 7800, desc: "Double Buff" }], path2: [{ name: "Time Field", cost: 260, desc: "Slow aura" }, { name: "Stasis Trap", cost: 560, desc: "Stuns" }, { name: "Temporal Rift", cost: 1400, desc: "Massive Slow" }, { name: "Time Warp", cost: 3200, desc: "Reverses enemies" }, { name: "Chronosphere", cost: 7200, desc: "Freezes Time" }] } },
+pylon: { name: "Chrono-Pylon", cost: 320, range: 100, damage: 0, cooldown: 0, color: "#ffffff", shape: "circle", type: "none", desc: "Buffs towers.", upgrades: { path1: [{ name: "Network Hub", cost: 220, desc: "+Range" }, { name: "Signal Boost", cost: 500, desc: "Unlocks damage aura" }, { name: "Global Uplink", cost: 1700, desc: "Global Buff" }, { name: "Overclock", cost: 3800, desc: "+Speed Aura" }, { name: "Command Center", cost: 7800, desc: "Elite aura package" }], path2: [{ name: "Time Field", cost: 260, desc: "Slow aura" }, { name: "Stasis Trap", cost: 560, desc: "Stuns" }, { name: "Temporal Rift", cost: 1400, desc: "Massive Slow" }, { name: "Time Warp", cost: 3200, desc: "Reverses enemies" }, { name: "Chronosphere", cost: 7200, desc: "Freezes Time" }] } },
 prism: { name: "Aether Prism", cost: 520, range: 170, damage: 8, cooldown: 12, color: "#bd00ff", shape: "triangle", type: "energy", desc: "Continuous beam.", upgrades: { path1: [{ name: "Focused Lens", cost: 320, desc: "x2 Damage" }, { name: "Gamma Burst", cost: 760, desc: "Armor Strip" }, { name: "Orbital Cannon", cost: 1900, desc: "Global Range" }, { name: "Plasma Cutter", cost: 4200, desc: "Melts HP" }, { name: "Death Star", cost: 9600, desc: "Obliterate" }], path2: [{ name: "Frost Runes", cost: 340, desc: "Slows" }, { name: "Entropy Field", cost: 760, desc: "Chains 2" }, { name: "Time Dilation", cost: 1700, desc: "Stops movement" }, { name: "Soul Drain", cost: 3600, desc: "Heals Lives" }, { name: "Void Ray", cost: 9200, desc: "Erases enemies" }] } },
 lance: { name: "Void Lance", cost: 540, range: 300, damage: 58, cooldown: 100, color: "#551A8B", shape: "triangle", projectileSpeed: 15, type: "physical", desc: "Sniper. Upgrades increase pierce.", upgrades: { path1: [{ name: "Targeting", cost: 300, desc: "+Range/Speed" }, { name: "Thermal", cost: 700, desc: "Explosive" }, { name: "Anti-Matter", cost: 1700, desc: "Insta-kill" }, { name: "Rail-Gun", cost: 4000, desc: "Pierce All" }, { name: "Orbital Strike", cost: 9800, desc: "Nuke Map" }], path2: [{ name: "Shadow Bind", cost: 340, desc: "Roots" }, { name: "Soul Siphon", cost: 820, desc: "Gain Life" }, { name: "Abyssal Gaze", cost: 2200, desc: "% HP Dmg" }, { name: "Executioner", cost: 4600, desc: "Kill <50% HP" }, { name: "Reaper", cost: 10500, desc: "Boss Slayer" }] } },
-mortar: { name: "Gravity Mortar", cost: 620, range: 245, damage: 34, cooldown: 125, color: "#ffaa00", shape: "circle", projectileSpeed: 4, type: "physical", desc: "Splash damage.", upgrades: { path1: [{ name: "Dark Matter", cost: 420, desc: "+Radius" }, { name: "Singularity", cost: 920, desc: "Pulls enemies" }, { name: "Anti-Matter", cost: 2300, desc: "Massive Dmg" }, { name: "Napalm", cost: 5000, desc: "Fire Area" }, { name: "Nuclear Winter", cost: 10200, desc: "Rad Zone" }], path2: [{ name: "Acid", cost: 360, desc: "Acid Pool" }, { name: "Midas Touch", cost: 860, desc: "+Gold" }, { name: "Meteor Swarm", cost: 2100, desc: "Rain Fire" }, { name: "Plague", cost: 4500, desc: "Spreading DoT" }, { name: "Armageddon", cost: 10000, desc: "Screen Nuke" }] } },
+mortar: { name: "Gravity Mortar", cost: 620, range: 245, damage: 34, cooldown: 125, color: "#ffaa00", shape: "circle", projectileSpeed: 4, type: "physical", desc: "Splash damage.", upgrades: { path1: [{ name: "Dark Matter", cost: 420, desc: "+Radius" }, { name: "Singularity", cost: 920, desc: "Stun pulse" }, { name: "Anti-Matter", cost: 2300, desc: "Massive Dmg" }, { name: "Napalm", cost: 5000, desc: "Fire Area" }, { name: "Nuclear Winter", cost: 10200, desc: "Rad Zone" }], path2: [{ name: "Acid", cost: 360, desc: "Acid Pool" }, { name: "Midas Touch", cost: 860, desc: "+Gold" }, { name: "Meteor Swarm", cost: 2100, desc: "Rain Fire" }, { name: "Plague", cost: 4500, desc: "Spreading DoT" }, { name: "Armageddon", cost: 10000, desc: "Screen Nuke" }] } },
 nullifier: { name: "Nullifier", cost: 760, range: 150, damage: 6, cooldown: 62, color: "#fff", shape: "orb", projectileSpeed: 10, type: "hybrid", desc: "Strips immunities.", upgrades: { path1: [{name:"Nanites", cost:360, desc:"AoE Cloud"}, {name:"Shredder", cost:760, desc:"Resist Strip"}, {name:"True Dmg", cost:1900, desc:"Ignore Armor"}, {name:"Destabilizer", cost:4500, desc:"Explode on Death"}, {name:"Grey Goo", cost:9800, desc:"Map Eater"}], path2: [{name:"Weakness", cost:360, desc:"+Damage Taken"}, {name:"Soul Sap", cost:760, desc:"Heal on hit"}, {name:"Doom", cost:1800, desc:"Dmg after time"}, {name:"Silence", cost:4200, desc:"Stop Abilities"}, {name:"Void Collapse", cost:9900, desc:"Black Hole"}]} }
 };
 
@@ -104,11 +111,29 @@ let enemies = [];
 let projectiles = [];
 let particles = [];
 let mines = [];
+let acidPools = [];
 let visualEffects = []; 
 let buildMode = null; 
 let selectedTower = null; 
 let mousePos = { x: 0, y: 0 }; 
 let pathPoints = []; 
+
+function applyStatusLegendState() {
+const legend = document.getElementById('status-legend');
+const btn = document.getElementById('legend-toggle-btn');
+if (!legend || !btn) return;
+const collapsed = localStorage.getItem('tad_legend_collapsed') === '1';
+legend.classList.toggle('legend-collapsed', collapsed);
+legend.classList.toggle('legend-expanded', !collapsed);
+btn.textContent = collapsed ? '+' : '-';
+btn.setAttribute('aria-label', collapsed ? 'Expand status legend' : 'Collapse status legend');
+}
+
+function toggleStatusLegend() {
+const collapsed = localStorage.getItem('tad_legend_collapsed') === '1';
+localStorage.setItem('tad_legend_collapsed', collapsed ? '0' : '1');
+applyStatusLegendState();
+}
 
 // --- Input Handling & Resizing ---
 function updateMousePos(e) {
@@ -146,6 +171,9 @@ if (selectedTower) {
 // Abilities (Z, X)
 if (key === 'z') activateAbility('laser');
 if (key === 'x') activateAbility('freeze');
+
+// UI Toggle (L)
+if (key === 'l') toggleStatusLegend();
 
 // Start Wave (Space)
 if (e.code === 'Space' && !gameState.isPlaying && !gameState.activeAbility && !buildMode) {
@@ -212,6 +240,26 @@ draw(ctx) {
         
         ctx.shadowBlur = 0;
     }
+    else if (this.type === 'singularity') {
+        const pulse = 1 + Math.sin((this.maxLife - this.life) * 0.7) * 0.12;
+        const r = this.radius * (1 - alpha * 0.35) * pulse;
+
+        const grad = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, r);
+        grad.addColorStop(0, 'rgba(255,255,255,0.35)');
+        grad.addColorStop(0.4, this.color);
+        grad.addColorStop(1, 'rgba(20,10,35,0)');
+
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, r, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.strokeStyle = 'rgba(220, 210, 255, 0.7)';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, Math.max(3, r * 0.55), 0, Math.PI * 2);
+        ctx.stroke();
+    }
     ctx.restore();
 }
 }
@@ -243,6 +291,7 @@ constructor(typeKey) {
         this.pathIndex = 0; this.x = pathPoints[0].x; this.y = pathPoints[0].y;
     }
     this.distanceTravelled = 0; this.slowTimer = 0; this.stunTimer = 0; this.dotTimer = 0; this.regenTimer = 0;
+    this.exposeTimer = 0;
 }
 update() {
     if (gameState.freezeTimer > 0) return; 
@@ -250,6 +299,7 @@ update() {
     if (this.stunTimer > 0) { currentSpeed = 0; this.stunTimer--; }
     else if (this.slowTimer > 0) { currentSpeed = this.speed * 0.5; this.slowTimer--; }
     if (this.dotTimer > 0) { if (this.dotTimer % 60 === 0) this.takeDamage(5); this.dotTimer--; }
+    if (this.exposeTimer > 0) this.exposeTimer--;
     if (this.name === "Regenerator") { this.regenTimer++; if (this.regenTimer > 60) { if (this.hp < this.maxHp) this.hp += 10; this.regenTimer = 0; } }
     if (this.name === "Phase-Shifter" && Math.random() < 0.005) { this.x += (Math.random() - 0.5) * 40; this.y += (Math.random() - 0.5) * 40; particles.push(new Particle(this.x, this.y, this.color, 4, 15)); }
     if (currentSpeed <= 0) return;
@@ -276,6 +326,7 @@ takeDamage(amount, sourceTower) {
         if (this.resistance === 'physical' && sourceTower.type === 'physical') { actualDamage *= 0.25; particles.push(new Particle(this.x, this.y, '#888', 2, 10)); }
         if (this.resistance === 'energy' && sourceTower.type === 'energy') { actualDamage *= 0.25; particles.push(new Particle(this.x, this.y, '#000', 2, 10)); }
     }
+    if (this.exposeTimer > 0) actualDamage *= EXPOSE_DAMAGE_MULTIPLIER;
     if (sourceTower) sourceTower.totalDamage += actualDamage; 
     this.hp -= actualDamage;
     if (Math.random() < 0.3) particles.push(new Particle(this.x, this.y, this.color, 2, 10));
@@ -357,6 +408,10 @@ draw() {
         ctx.strokeStyle = "#00ffff"; ctx.lineWidth = 2;
         ctx.beginPath(); ctx.arc(0,0, this.radius + 4, 0, Math.PI*2); ctx.stroke();
     }
+    if (this.exposeTimer > 0) {
+        ctx.strokeStyle = "#b7ff36"; ctx.lineWidth = 1.5;
+        ctx.beginPath(); ctx.arc(0, 0, this.radius + 7, 0, Math.PI * 2); ctx.stroke();
+    }
     
     ctx.restore();
 }
@@ -416,23 +471,32 @@ act() {
         towers.forEach(t => { 
             if (t === this) return; 
             if (Math.hypot(t.x - this.x, t.y - this.y) <= buffRange) { 
-                // Base: +12% Damage
-                t.buffDamageMultiplier = Math.max(t.buffDamageMultiplier, 1.12);
+                // Base: minor support only (+5% range)
+                t.buffRangeMultiplier = Math.max(t.buffRangeMultiplier, 1.05);
                 
-                // Path 1 Lvl 2: +20% Range
-                if (this.path === 1 && this.level >= 2) t.buffRangeMultiplier = Math.max(t.buffRangeMultiplier, 1.2);
+                // Path 1 Lvl 2: unlock main damage aura
+                if (this.path === 1 && this.level >= 2) t.buffDamageMultiplier = Math.max(t.buffDamageMultiplier, 1.12);
                 
-                // Path 1 Lvl 4: 10% Discount
-                if (this.path === 1 && this.level >= 4) t.buffCostMultiplier = Math.min(t.buffCostMultiplier, 0.93);
+                // Path 1 Lvl 4: attack speed aura
+                if (this.path === 1 && this.level >= 4) t.buffSpeedMultiplier = Math.max(t.buffSpeedMultiplier, 1.1);
                 
-                // Path 1 Lvl 5: 25% Discount and +50% Damage
+                // Path 1 Lvl 5: premium command aura
                 if (this.path === 1 && this.level >= 5) {
-                    t.buffCostMultiplier = Math.min(t.buffCostMultiplier, 0.85);
-                    t.buffDamageMultiplier = Math.max(t.buffDamageMultiplier, 1.3);
+                    t.buffCostMultiplier = Math.min(t.buffCostMultiplier, 0.9);
+                    t.buffDamageMultiplier = Math.max(t.buffDamageMultiplier, 1.25);
+                    t.buffRangeMultiplier = Math.max(t.buffRangeMultiplier, 1.16);
                 }
             } 
         });
-        if (this.path === 2) { enemies.forEach(e => { if (Math.hypot(e.x - this.x, e.y - this.y) <= this.range) { if (this.level >= 1) e.slowTimer = 5; if (this.level >= 5) e.stunTimer = 1; } }); }
+        if (this.path === 2) {
+            enemies.forEach(e => {
+                if (Math.hypot(e.x - this.x, e.y - this.y) <= this.range) {
+                    if (this.level >= 1) e.slowTimer = Math.max(e.slowTimer, 5);
+                    if (this.level >= 3) e.slowTimer = Math.max(e.slowTimer, 9);
+                    if (this.level >= 5) e.stunTimer = Math.max(e.stunTimer, 2);
+                }
+            });
+        }
         return; 
     }
     if (this.type === 'miner') return;
@@ -581,11 +645,22 @@ shoot(target, dmg) {
     }
 
     let p = new Projectile(this.x, this.y, target, this.type, dmg, this.projectileSpeed, this);
-        if (this.type === 'sentry') {
+    if (this.type === 'sentry') {
         if (this.path === 1 && this.level >= 2) p.pierce = 1;
-            if (this.path === 1 && this.level >= 5) p.damage *= 4; 
-        if (this.path === 2 && this.level >= 2) p.seeking = true;
-        if (this.path === 2 && this.level >= 3) { setTimeout(() => projectiles.push(new Projectile(this.x, this.y, target, this.type, dmg, this.projectileSpeed, this)), 5); setTimeout(() => projectiles.push(new Projectile(this.x, this.y, target, this.type, dmg, this.projectileSpeed, this)), 10); }
+        if (this.path === 1 && this.level >= 5) p.damage *= 4; 
+        if (this.path === 2 && this.level >= 2) p.appliesExpose = true;
+        if (this.path === 2 && this.level >= 3) {
+            setTimeout(() => {
+                let p2 = new Projectile(this.x, this.y, target, this.type, dmg, this.projectileSpeed, this);
+                if (this.path === 2 && this.level >= 2) p2.appliesExpose = true;
+                projectiles.push(p2);
+            }, 5);
+            setTimeout(() => {
+                let p3 = new Projectile(this.x, this.y, target, this.type, dmg, this.projectileSpeed, this);
+                if (this.path === 2 && this.level >= 2) p3.appliesExpose = true;
+                projectiles.push(p3);
+            }, 10);
+        }
     }
     if (this.type === 'mortar') {
         if (this.path === 1 && this.level >= 1) p.explosionRadius *= 1.5;
@@ -662,6 +737,21 @@ draw() {
             ctx.setLineDash([]);
         }
         ctx.fill(); ctx.stroke(); ctx.setLineDash([]); 
+
+        if (this.type === 'pylon' && this.path === 2 && this.level >= 1) {
+            const pulse = Math.sin(gameState.frames * 0.08) * 8;
+            ctx.strokeStyle = "rgba(120, 230, 255, 0.35)";
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(0, 0, Math.max(10, r - 16 + pulse), 0, Math.PI * 2);
+            ctx.stroke();
+            if (this.level >= 3) {
+                ctx.strokeStyle = "rgba(150, 180, 255, 0.35)";
+                ctx.beginPath();
+                ctx.arc(0, 0, Math.max(10, r - 30 - pulse * 0.6), 0, Math.PI * 2);
+                ctx.stroke();
+            }
+        }
     }
 
     // 2. Base Pedestal
@@ -742,6 +832,15 @@ draw() {
         ctx.beginPath(); ctx.arc(dotStart + (i*6), 18, 1.5, 0, Math.PI*2); ctx.fill();
     }
 
+    // Buff indicator for readability in mixed compositions.
+    if (this.type !== 'pylon' && (this.buffDamageMultiplier > 1.01 || this.buffRangeMultiplier > 1.01 || this.buffSpeedMultiplier > 1.01 || this.buffCostMultiplier < 0.99)) {
+        ctx.strokeStyle = "rgba(255, 220, 120, 0.65)";
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.arc(0, 0, 18 + Math.sin(gameState.frames * 0.08) * 2, 0, Math.PI * 2);
+        ctx.stroke();
+    }
+
     ctx.restore();
 }
 }
@@ -755,6 +854,7 @@ constructor(x, y, target, type, damage, speed, sourceTower) {
     this.type = type; this.damage = damage; this.speed = speed;
     this.sourceTower = sourceTower;
     this.active = true; this.pierce = 0; this.seeking = false;
+    this.appliesExpose = false;
     this.explosionRadius = 0; this.isExplosive = false;
     this.hitList = []; // Track who we hit (for linear shots)
 
@@ -845,6 +945,32 @@ hit(targetEnemy) {
                 }
             }
         });
+
+        if (this.type === 'mortar' && this.sourceTower) {
+            if (this.sourceTower.path === 1 && this.sourceTower.level >= 2) {
+                visualEffects.push(new VisualEffect('singularity', this.x, this.y, { radius: Math.max(55, rad * 0.85), color: '#7f6cff', life: 16 }));
+                enemies.forEach(e => {
+                    if (Math.hypot(e.x - this.x, e.y - this.y) <= Math.max(55, rad * 0.85)) {
+                        e.stunTimer = Math.max(e.stunTimer, SINGULARITY_STUN_FRAMES);
+                    }
+                });
+            }
+            if (this.sourceTower.path === 2 && this.sourceTower.level >= 1) {
+                const lvl = this.sourceTower.level;
+                acidPools.push({
+                    x: this.x,
+                    y: this.y,
+                    radius: ACID_POOL_BASE_RADIUS + lvl * 3,
+                    life: ACID_POOL_BASE_LIFE + lvl * 12,
+                    maxLife: ACID_POOL_BASE_LIFE + lvl * 12,
+                    tickRate: Math.max(10, ACID_POOL_TICK_RATE - Math.floor(lvl / 2)),
+                    tickTimer: 0,
+                    damage: Math.max(4, this.damage * 0.15),
+                    slowTimer: 7 + Math.floor(lvl / 2),
+                    source: this.sourceTower
+                });
+            }
+        }
     } else {
         // Standard hit
         let t = targetEnemy || (this.target && enemies.includes(this.target) ? this.target : null);
@@ -854,6 +980,10 @@ hit(targetEnemy) {
                 t.takeDamage(this.damage, this.sourceTower);
             } else {
                 t.takeDamage(this.damage, this.sourceTower);
+            }
+            if (this.appliesExpose) {
+                t.exposeTimer = Math.max(t.exposeTimer, EXPOSE_DURATION_FRAMES);
+                particles.push(new Particle(t.x, t.y, '#b7ff36', 2, 14));
             }
             if (this.pierce > 0) { 
                 this.pierce--; 
@@ -889,6 +1019,10 @@ draw() {
         ctx.stroke();
 
         ctx.shadowBlur = 0;
+    }
+    else if (this.appliesExpose) {
+        ctx.fillStyle = "#b7ff36";
+        ctx.arc(this.x, this.y, 3.5, 0, Math.PI * 2);
     }
     else { ctx.fillStyle = "#00f3ff"; ctx.arc(this.x, this.y, 3, 0, Math.PI * 2); }
     ctx.fill();
@@ -1180,7 +1314,7 @@ gameState.wave = 1;
 gameState.isPlaying = false;
 gameState.gameOver = false;
 gameState.endless = false;
-towers = []; enemies = []; projectiles = []; particles = []; mines = []; visualEffects = [];
+towers = []; enemies = []; projectiles = []; particles = []; mines = []; acidPools = []; visualEffects = [];
 updateUI();
 }
 
@@ -1377,6 +1511,23 @@ for (let i = mines.length - 1; i >= 0; i--) {
     }
     if (hit || m.life <= 0) mines.splice(i, 1);
 }
+for (let i = acidPools.length - 1; i >= 0; i--) {
+    const pool = acidPools[i];
+    pool.life--;
+    pool.tickTimer++;
+    const shouldTickDamage = pool.tickTimer >= pool.tickRate;
+    if (shouldTickDamage) pool.tickTimer = 0;
+
+    for (let e of enemies) {
+        if (Math.hypot(e.x - pool.x, e.y - pool.y) <= pool.radius) {
+            e.slowTimer = Math.max(e.slowTimer, pool.slowTimer);
+            e.exposeTimer = Math.max(e.exposeTimer, 20);
+            if (shouldTickDamage) e.takeDamage(pool.damage, pool.source);
+        }
+    }
+
+    if (pool.life <= 0) acidPools.splice(i, 1);
+}
 projectiles = projectiles.filter(p => p.active);
 particles = particles.filter(p => p.life > 0);
 }
@@ -1486,6 +1637,27 @@ function drawGame() {
         ctx.shadowBlur = 0;
     });
 
+    acidPools.forEach(pool => {
+        const alpha = Math.max(0, pool.life / pool.maxLife);
+        const ripple = Math.sin((gameState.frames + pool.x * 0.1) * 0.12) * 4;
+
+        ctx.save();
+        const grad = ctx.createRadialGradient(pool.x, pool.y, 6, pool.x, pool.y, pool.radius + 5);
+        grad.addColorStop(0, `rgba(170, 255, 40, ${0.34 * alpha})`);
+        grad.addColorStop(1, `rgba(90, 160, 20, ${0.03 * alpha})`);
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.arc(pool.x, pool.y, pool.radius, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.strokeStyle = `rgba(198, 255, 80, ${0.42 * alpha})`;
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.arc(pool.x, pool.y, Math.max(8, pool.radius - 7 + ripple), 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
+    });
+
     towers.forEach(t => t.draw());
     enemies.forEach(e => e.draw());
     projectiles.forEach(p => p.draw());
@@ -1535,6 +1707,7 @@ requestAnimationFrame(gameLoop);
 
 function init() {
 renderMapSelection();
+applyStatusLegendState();
 gameLoop();
 }
 

@@ -34,6 +34,37 @@
         <!-- Game Area -->
         <div id="game-area">
             <canvas id="gameCanvas" width="1000" height="600"></canvas>
+
+            <div id="status-legend" aria-label="Status Effects Legend" class="legend-expanded">
+                <div class="legend-title-row">
+                    <div class="legend-title">Status Legend</div>
+                    <button id="legend-toggle-btn" type="button" onclick="toggleStatusLegend()" aria-label="Collapse status legend" title="Toggle Legend [L]">- [L]</button>
+                </div>
+
+                <div class="legend-row">
+                    <span class="legend-swatch swatch-exposed" aria-hidden="true"></span>
+                    <div class="legend-copy">
+                        <div class="legend-name">Exposed</div>
+                        <div class="legend-desc">Marked targets take bonus damage.</div>
+                    </div>
+                </div>
+
+                <div class="legend-row">
+                    <span class="legend-swatch swatch-acid" aria-hidden="true"></span>
+                    <div class="legend-copy">
+                        <div class="legend-name">Acid Pool</div>
+                        <div class="legend-desc">Zone control: slows and chips enemies over time.</div>
+                    </div>
+                </div>
+
+                <div class="legend-row">
+                    <span class="legend-swatch swatch-chrono" aria-hidden="true"></span>
+                    <div class="legend-copy">
+                        <div class="legend-name">Chrono Aura</div>
+                        <div class="legend-desc">Rings show support aura and time-field effects.</div>
+                    </div>
+                </div>
+            </div>
             
             <!-- Floating Upgrade Modal (Centered over canvas) -->
             <div id="upgrade-modal">
