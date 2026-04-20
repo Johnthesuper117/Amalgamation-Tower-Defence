@@ -75,16 +75,16 @@ const ENEMIES = {
 };
 
 const TOWER_TYPES = {
-miner: { name: "Data-Mine", cost: 150, range: 0, damage: 0, cooldown: 0, color: "#4CAF50", shape: "square", type: "none", desc: "Generates Ψ 15 per wave.", upgrades: { path1: [{ name: "Overclock", cost: 100, desc: "+10 Cash" }, { name: "Crypto Farm", cost: 300, desc: "+25 Cash" }, { name: "Blockchain AI", cost: 800, desc: "+10% Interest" }, { name: "Server Farm", cost: 2000, desc: "+150 Cash" }, { name: "Quantum Market", cost: 5000, desc: "+20% Interest" }], path2: [{ name: "Alchemy", cost: 150, desc: "Kill Cash +1" }, { name: "Transmute", cost: 400, desc: "+40 Cash" }, { name: "Philosopher Stone", cost: 1000, desc: "+100 Cash" }, { name: "Golden Age", cost: 2500, desc: "Base Gen x2" }, { name: "Midas Curse", cost: 6000, desc: "Kill Cash +5" }] } },
-sentry: { name: "Quantum Sentry", cost: 250, range: 120, damage: 10, cooldown: 30, color: "#00a8f3", shape: "square", projectileSpeed: 8, type: "physical", desc: "Rapid fire kinetic.", upgrades: { path1: [{ name: "Accelerator", cost: 150, desc: "Faster Fire" }, { name: "Pierce", cost: 400, desc: "Hits 2 targets" }, { name: "Railgun", cost: 1200, desc: "Fast & High Dmg" }, { name: "Gatling", cost: 2500, desc: "Insane Fire Rate" }, { name: "Death Ray", cost: 6000, desc: "Instant Hit Beam" }], path2: [{ name: "Rune Carving", cost: 150, desc: "+5 Damage" }, { name: "Seeking", cost: 350, desc: "Auto-aim" }, { name: "Multi-Shot", cost: 1000, desc: "Fires 3 bolts" }, { name: "Spell Weaver", cost: 2200, desc: "Double Projectiles" }, { name: "Eldritch Blast", cost: 5500, desc: "Explosive Magic" }] } },
-vent: { name: "Flux Vent", cost: 300, range: 80, damage: 1, cooldown: 6, color: "#FF4500", shape: "triangle", projectileSpeed: 0, type: "energy", desc: "Short range AoE spray.", upgrades: { path1: [{ name: "High Pressure", cost: 200, desc: "+Range" }, { name: "Plasma Fire", cost: 450, desc: "+Damage" }, { name: "Blue Flame", cost: 1100, desc: "Melts Armor" }, { name: "Fusion Core", cost: 2400, desc: "Massive Cone" }, { name: "Solar Wind", cost: 5000, desc: "Global DoT Aura" }], path2: [{ name: "Cursed Fumes", cost: 250, desc: "Slows enemies" }, { name: "Hex Cloud", cost: 500, desc: "Reduces Dmg Dealt" }, { name: "Soul Burn", cost: 1200, desc: "% Max HP Dmg" }, { name: "Terror", cost: 2600, desc: "Stuns briefly" }, { name: "Nether Rift", cost: 5500, desc: "Insta-kill low HP" }] } },
-coil: { name: "Tesla Coil", cost: 450, range: 130, damage: 15, cooldown: 45, color: "#00FFFF", shape: "circle", projectileSpeed: 0, type: "energy", desc: "Chains lightning.", upgrades: { path1: [{ name: "High Voltage", cost: 250, desc: "+Damage" }, { name: "Capacitor", cost: 550, desc: "More Chains" }, { name: "Overload", cost: 1400, desc: "Fast Fire Rate" }, { name: "Arc Reactor", cost: 3000, desc: "Chains Unlimited" }, { name: "Thunder God", cost: 7000, desc: "Screen Wipe Zap" }], path2: [{ name: "Static", cost: 300, desc: "Slows targets" }, { name: "Shock", cost: 600, desc: "Stuns targets" }, { name: "Chain Reaction", cost: 1500, desc: "Explodes on death" }, { name: "Storm Caller", cost: 3200, desc: "Strikes randoms" }, { name: "Zeus's Wrath", cost: 7500, desc: "Massive AoE Stun" }] } },
-fabricator: { name: "Fabricator", cost: 550, range: 100, damage: 40, cooldown: 100, color: "#808080", shape: "square", projectileSpeed: 0, type: "physical", desc: "Places mines on track.", upgrades: { path1: [{ name: "Proximity", cost: 300, desc: "Wider Trigger" }, { name: "Cluster Mine", cost: 600, desc: "Spawns 3 mines" }, { name: "High Explosive", cost: 1500, desc: "Huge Damage" }, { name: "Smart Mines", cost: 3500, desc: "Seek enemies" }, { name: "Nuke Layer", cost: 8000, desc: "Nuclear Mines" }], path2: [{ name: "Rune Trap", cost: 350, desc: "Magic Dmg" }, { name: "Frost Glyph", cost: 700, desc: "Freezes enemies" }, { name: "Gravity Sigil", cost: 1600, desc: "Sucks enemies in" }, { name: "Void Gate", cost: 3800, desc: "Teleports enemy back" }, { name: "Dimensional Rift", cost: 8500, desc: "Removes enemy" }] } },
-pylon: { name: "Chrono-Pylon", cost: 350, range: 100, damage: 0, cooldown: 0, color: "#ffffff", shape: "circle", type: "none", desc: "Buffs towers.", upgrades: { path1: [{ name: "Network Hub", cost: 200, desc: "+Range" }, { name: "Signal Boost", cost: 400, desc: "Stronger Buff" }, { name: "Global Uplink", cost: 1500, desc: "Global Buff" }, { name: "Overclock", cost: 3000, desc: "+Dmg Buff" }, { name: "Command Center", cost: 6000, desc: "Double Buff" }], path2: [{ name: "Time Field", cost: 250, desc: "Slow aura" }, { name: "Stasis Trap", cost: 500, desc: "Stuns" }, { name: "Temporal Rift", cost: 1200, desc: "Massive Slow" }, { name: "Time Warp", cost: 2800, desc: "Reverses enemies" }, { name: "Chronosphere", cost: 6500, desc: "Freezes Time" }] } },
-prism: { name: "Aether Prism", cost: 400, range: 180, damage: 1, cooldown: 0, color: "#bd00ff", shape: "triangle", type: "energy", desc: "Continuous beam.", upgrades: { path1: [{ name: "Focused Lens", cost: 250, desc: "x2 Damage" }, { name: "Gamma Burst", cost: 600, desc: "Armor Strip" }, { name: "Orbital Cannon", cost: 1500, desc: "Global Range" }, { name: "Plasma Cutter", cost: 3500, desc: "Melts HP" }, { name: "Death Star", cost: 8000, desc: "Obliterate" }], path2: [{ name: "Frost Runes", cost: 300, desc: "Slows" }, { name: "Entropy Field", cost: 650, desc: "Chains 2" }, { name: "Time Dilation", cost: 1400, desc: "Stops movement" }, { name: "Soul Drain", cost: 3000, desc: "Heals Lives" }, { name: "Void Ray", cost: 7500, desc: "Erases enemies" }] } },
-lance: { name: "Void Lance", cost: 500, range: 300, damage: 50, cooldown: 90, color: "#551A8B", shape: "triangle", projectileSpeed: 15, type: "physical", desc: "Sniper. Upgrades increase pierce.", upgrades: { path1: [{ name: "Targeting", cost: 250, desc: "+Range/Speed" }, { name: "Thermal", cost: 600, desc: "Explosive" }, { name: "Anti-Matter", cost: 1500, desc: "Insta-kill" }, { name: "Rail-Gun", cost: 3500, desc: "Pierce All" }, { name: "Orbital Strike", cost: 9000, desc: "Nuke Map" }], path2: [{ name: "Shadow Bind", cost: 300, desc: "Roots" }, { name: "Soul Siphon", cost: 700, desc: "Gain Life" }, { name: "Abyssal Gaze", cost: 2000, desc: "% HP Dmg" }, { name: "Executioner", cost: 4000, desc: "Kill <50% HP" }, { name: "Reaper", cost: 9500, desc: "Boss Slayer" }] } },
-mortar: { name: "Gravity Mortar", cost: 600, range: 250, damage: 30, cooldown: 120, color: "#ffaa00", shape: "circle", projectileSpeed: 4, type: "physical", desc: "Splash damage.", upgrades: { path1: [{ name: "Dark Matter", cost: 350, desc: "+Radius" }, { name: "Singularity", cost: 800, desc: "Pulls enemies" }, { name: "Anti-Matter", cost: 2000, desc: "Massive Dmg" }, { name: "Napalm", cost: 4500, desc: "Fire Area" }, { name: "Nuclear Winter", cost: 9000, desc: "Rad Zone" }], path2: [{ name: "Acid", cost: 300, desc: "Acid Pool" }, { name: "Midas Touch", cost: 750, desc: "+Gold" }, { name: "Meteor Swarm", cost: 1800, desc: "Rain Fire" }, { name: "Plague", cost: 4000, desc: "Spreading DoT" }, { name: "Armageddon", cost: 9500, desc: "Screen Nuke" }] } },
-nullifier: { name: "Nullifier", cost: 700, range: 150, damage: 5, cooldown: 60, color: "#fff", shape: "orb", projectileSpeed: 10, type: "hybrid", desc: "Strips immunities.", upgrades: { path1: [{name:"Nanites", cost:300, desc:"AoE Cloud"}, {name:"Shredder", cost:600, desc:"Resist Strip"}, {name:"True Dmg", cost:1500, desc:"Ignore Armor"}, {name:"Destabilizer", cost:4000, desc:"Explode on Death"}, {name:"Grey Goo", cost:9000, desc:"Map Eater"}], path2: [{name:"Weakness", cost:300, desc:"+Damage Taken"}, {name:"Soul Sap", cost:600, desc:"Heal on hit"}, {name:"Doom", cost:1500, desc:"Dmg after time"}, {name:"Silence", cost:3500, desc:"Stop Abilities"}, {name:"Void Collapse", cost:9500, desc:"Black Hole"}]} }
+miner: { name: "Data-Mine", cost: 160, range: 0, damage: 0, cooldown: 0, color: "#4CAF50", shape: "square", type: "none", desc: "Generates Ψ 15 per wave.", upgrades: { path1: [{ name: "Overclock", cost: 120, desc: "+10 Cash" }, { name: "Crypto Farm", cost: 340, desc: "+25 Cash" }, { name: "Blockchain AI", cost: 900, desc: "+10% Interest" }, { name: "Server Farm", cost: 2400, desc: "+150 Cash" }, { name: "Quantum Market", cost: 6500, desc: "+20% Interest" }], path2: [{ name: "Alchemy", cost: 180, desc: "Kill Cash +1" }, { name: "Transmute", cost: 450, desc: "+40 Cash" }, { name: "Philosopher Stone", cost: 1100, desc: "+100 Cash" }, { name: "Golden Age", cost: 2900, desc: "Base Gen x2" }, { name: "Midas Curse", cost: 7000, desc: "Kill Cash +5" }] } },
+sentry: { name: "Quantum Sentry", cost: 260, range: 125, damage: 11, cooldown: 32, color: "#00a8f3", shape: "square", projectileSpeed: 8, type: "physical", desc: "Rapid fire kinetic.", upgrades: { path1: [{ name: "Accelerator", cost: 170, desc: "Faster Fire" }, { name: "Pierce", cost: 450, desc: "Hits 2 targets" }, { name: "Railgun", cost: 1300, desc: "Fast & High Dmg" }, { name: "Gatling", cost: 2900, desc: "Insane Fire Rate" }, { name: "Death Ray", cost: 7600, desc: "Instant Hit Beam" }], path2: [{ name: "Rune Carving", cost: 170, desc: "+5 Damage" }, { name: "Seeking", cost: 400, desc: "Auto-aim" }, { name: "Multi-Shot", cost: 1150, desc: "Fires 3 bolts" }, { name: "Spell Weaver", cost: 2500, desc: "Double Projectiles" }, { name: "Eldritch Blast", cost: 7000, desc: "Explosive Magic" }] } },
+vent: { name: "Flux Vent", cost: 280, range: 90, damage: 1.2, cooldown: 7, color: "#FF4500", shape: "triangle", projectileSpeed: 0, type: "energy", desc: "Short range AoE spray.", upgrades: { path1: [{ name: "High Pressure", cost: 220, desc: "+Range" }, { name: "Plasma Fire", cost: 520, desc: "+Damage" }, { name: "Blue Flame", cost: 1300, desc: "Melts Armor" }, { name: "Fusion Core", cost: 3000, desc: "Massive Cone" }, { name: "Solar Wind", cost: 6800, desc: "Global DoT Aura" }], path2: [{ name: "Cursed Fumes", cost: 260, desc: "Slows enemies" }, { name: "Hex Cloud", cost: 620, desc: "Reduces Dmg Dealt" }, { name: "Soul Burn", cost: 1400, desc: "% Max HP Dmg" }, { name: "Terror", cost: 3200, desc: "Stuns briefly" }, { name: "Nether Rift", cost: 7200, desc: "Insta-kill low HP" }] } },
+coil: { name: "Tesla Coil", cost: 430, range: 135, damage: 18, cooldown: 48, color: "#00FFFF", shape: "circle", projectileSpeed: 0, type: "energy", desc: "Chains lightning.", upgrades: { path1: [{ name: "High Voltage", cost: 280, desc: "+Damage" }, { name: "Capacitor", cost: 620, desc: "More Chains" }, { name: "Overload", cost: 1500, desc: "Fast Fire Rate" }, { name: "Arc Reactor", cost: 3400, desc: "Chains Unlimited" }, { name: "Thunder God", cost: 8200, desc: "Screen Wipe Zap" }], path2: [{ name: "Static", cost: 320, desc: "Slows targets" }, { name: "Shock", cost: 700, desc: "Stuns targets" }, { name: "Chain Reaction", cost: 1700, desc: "Explodes on death" }, { name: "Storm Caller", cost: 3600, desc: "Strikes randoms" }, { name: "Zeus's Wrath", cost: 8500, desc: "Massive AoE Stun" }] } },
+fabricator: { name: "Fabricator", cost: 520, range: 105, damage: 38, cooldown: 95, color: "#808080", shape: "square", projectileSpeed: 0, type: "physical", desc: "Places mines on track.", upgrades: { path1: [{ name: "Proximity", cost: 340, desc: "Wider Trigger" }, { name: "Cluster Mine", cost: 750, desc: "Spawns 3 mines" }, { name: "High Explosive", cost: 1800, desc: "Huge Damage" }, { name: "Smart Mines", cost: 4100, desc: "Seek enemies" }, { name: "Nuke Layer", cost: 9000, desc: "Nuclear Mines" }], path2: [{ name: "Rune Trap", cost: 380, desc: "Magic Dmg" }, { name: "Frost Glyph", cost: 820, desc: "Freezes enemies" }, { name: "Gravity Sigil", cost: 1900, desc: "Sucks enemies in" }, { name: "Void Gate", cost: 4500, desc: "Teleports enemy back" }, { name: "Dimensional Rift", cost: 9800, desc: "Removes enemy" }] } },
+pylon: { name: "Chrono-Pylon", cost: 320, range: 100, damage: 0, cooldown: 0, color: "#ffffff", shape: "circle", type: "none", desc: "Buffs towers.", upgrades: { path1: [{ name: "Network Hub", cost: 220, desc: "+Range" }, { name: "Signal Boost", cost: 500, desc: "Stronger Buff" }, { name: "Global Uplink", cost: 1700, desc: "Global Buff" }, { name: "Overclock", cost: 3800, desc: "+Dmg Buff" }, { name: "Command Center", cost: 7800, desc: "Double Buff" }], path2: [{ name: "Time Field", cost: 260, desc: "Slow aura" }, { name: "Stasis Trap", cost: 560, desc: "Stuns" }, { name: "Temporal Rift", cost: 1400, desc: "Massive Slow" }, { name: "Time Warp", cost: 3200, desc: "Reverses enemies" }, { name: "Chronosphere", cost: 7200, desc: "Freezes Time" }] } },
+prism: { name: "Aether Prism", cost: 520, range: 170, damage: 8, cooldown: 12, color: "#bd00ff", shape: "triangle", type: "energy", desc: "Continuous beam.", upgrades: { path1: [{ name: "Focused Lens", cost: 320, desc: "x2 Damage" }, { name: "Gamma Burst", cost: 760, desc: "Armor Strip" }, { name: "Orbital Cannon", cost: 1900, desc: "Global Range" }, { name: "Plasma Cutter", cost: 4200, desc: "Melts HP" }, { name: "Death Star", cost: 9600, desc: "Obliterate" }], path2: [{ name: "Frost Runes", cost: 340, desc: "Slows" }, { name: "Entropy Field", cost: 760, desc: "Chains 2" }, { name: "Time Dilation", cost: 1700, desc: "Stops movement" }, { name: "Soul Drain", cost: 3600, desc: "Heals Lives" }, { name: "Void Ray", cost: 9200, desc: "Erases enemies" }] } },
+lance: { name: "Void Lance", cost: 540, range: 300, damage: 58, cooldown: 100, color: "#551A8B", shape: "triangle", projectileSpeed: 15, type: "physical", desc: "Sniper. Upgrades increase pierce.", upgrades: { path1: [{ name: "Targeting", cost: 300, desc: "+Range/Speed" }, { name: "Thermal", cost: 700, desc: "Explosive" }, { name: "Anti-Matter", cost: 1700, desc: "Insta-kill" }, { name: "Rail-Gun", cost: 4000, desc: "Pierce All" }, { name: "Orbital Strike", cost: 9800, desc: "Nuke Map" }], path2: [{ name: "Shadow Bind", cost: 340, desc: "Roots" }, { name: "Soul Siphon", cost: 820, desc: "Gain Life" }, { name: "Abyssal Gaze", cost: 2200, desc: "% HP Dmg" }, { name: "Executioner", cost: 4600, desc: "Kill <50% HP" }, { name: "Reaper", cost: 10500, desc: "Boss Slayer" }] } },
+mortar: { name: "Gravity Mortar", cost: 620, range: 245, damage: 34, cooldown: 125, color: "#ffaa00", shape: "circle", projectileSpeed: 4, type: "physical", desc: "Splash damage.", upgrades: { path1: [{ name: "Dark Matter", cost: 420, desc: "+Radius" }, { name: "Singularity", cost: 920, desc: "Pulls enemies" }, { name: "Anti-Matter", cost: 2300, desc: "Massive Dmg" }, { name: "Napalm", cost: 5000, desc: "Fire Area" }, { name: "Nuclear Winter", cost: 10200, desc: "Rad Zone" }], path2: [{ name: "Acid", cost: 360, desc: "Acid Pool" }, { name: "Midas Touch", cost: 860, desc: "+Gold" }, { name: "Meteor Swarm", cost: 2100, desc: "Rain Fire" }, { name: "Plague", cost: 4500, desc: "Spreading DoT" }, { name: "Armageddon", cost: 10000, desc: "Screen Nuke" }] } },
+nullifier: { name: "Nullifier", cost: 760, range: 150, damage: 6, cooldown: 62, color: "#fff", shape: "orb", projectileSpeed: 10, type: "hybrid", desc: "Strips immunities.", upgrades: { path1: [{name:"Nanites", cost:360, desc:"AoE Cloud"}, {name:"Shredder", cost:760, desc:"Resist Strip"}, {name:"True Dmg", cost:1900, desc:"Ignore Armor"}, {name:"Destabilizer", cost:4500, desc:"Explode on Death"}, {name:"Grey Goo", cost:9800, desc:"Map Eater"}], path2: [{name:"Weakness", cost:360, desc:"+Damage Taken"}, {name:"Soul Sap", cost:760, desc:"Heal on hit"}, {name:"Doom", cost:1800, desc:"Dmg after time"}, {name:"Silence", cost:4200, desc:"Stop Abilities"}, {name:"Void Collapse", cost:9900, desc:"Black Hole"}]} }
 };
 
 const canvas = document.getElementById('gameCanvas');
@@ -374,6 +374,7 @@ constructor(x, y, typeKey) {
     this.priority = 'first'; 
     this.currentTarget = null;
     this.totalDamage = 0; 
+    this.invested = type.cost;
 }
 update() { 
     this.buffSpeedMultiplier = 1.0; 
@@ -415,19 +416,19 @@ act() {
         towers.forEach(t => { 
             if (t === this) return; 
             if (Math.hypot(t.x - this.x, t.y - this.y) <= buffRange) { 
-                // Base: +20% Damage
-                t.buffDamageMultiplier = Math.max(t.buffDamageMultiplier, 1.2);
+                // Base: +12% Damage
+                t.buffDamageMultiplier = Math.max(t.buffDamageMultiplier, 1.12);
                 
                 // Path 1 Lvl 2: +20% Range
                 if (this.path === 1 && this.level >= 2) t.buffRangeMultiplier = Math.max(t.buffRangeMultiplier, 1.2);
                 
                 // Path 1 Lvl 4: 10% Discount
-                if (this.path === 1 && this.level >= 4) t.buffCostMultiplier = Math.min(t.buffCostMultiplier, 0.9);
+                if (this.path === 1 && this.level >= 4) t.buffCostMultiplier = Math.min(t.buffCostMultiplier, 0.93);
                 
                 // Path 1 Lvl 5: 25% Discount and +50% Damage
                 if (this.path === 1 && this.level >= 5) {
-                    t.buffCostMultiplier = Math.min(t.buffCostMultiplier, 0.75);
-                    t.buffDamageMultiplier = Math.max(t.buffDamageMultiplier, 1.5);
+                    t.buffCostMultiplier = Math.min(t.buffCostMultiplier, 0.85);
+                    t.buffDamageMultiplier = Math.max(t.buffDamageMultiplier, 1.3);
                 }
             } 
         });
@@ -509,14 +510,19 @@ shoot(target, dmg) {
         let d = dmg * (1 + this.level);
 
         if (this.path === 1 && this.level >= 1) d *= 2;
-        if (this.path === 1 && this.level >= 5) d *= 5;
+        if (this.path === 1 && this.level >= 5) d *= 2.5;
 
         // Apply damage
         target.takeDamage(d, this);
 
         // Prism slows / kills (your original logic)
         if (this.path === 2 && this.level >= 1) target.slowTimer = 5;
-        if (this.path === 2 && this.level >= 5) target.hp = 0;
+        if (this.path === 2 && this.level >= 5) {
+            const threshold = Math.max(120, target.maxHp * 0.18);
+            if (target.hp <= threshold && target.name !== "Omega Titan") {
+                target.takeDamage(target.hp + 1, this);
+            }
+        }
         if (this.path === 2 && this.level >= 2) this.chainLightning(target, 2, d);
 
         // --- NEW BEAM VISUAL ---
@@ -575,26 +581,26 @@ shoot(target, dmg) {
     }
 
     let p = new Projectile(this.x, this.y, target, this.type, dmg, this.projectileSpeed, this);
-    if (this.type === 'sentry') {
+        if (this.type === 'sentry') {
         if (this.path === 1 && this.level >= 2) p.pierce = 1;
-        if (this.path === 1 && this.level >= 5) p.damage *= 10; 
+            if (this.path === 1 && this.level >= 5) p.damage *= 4; 
         if (this.path === 2 && this.level >= 2) p.seeking = true;
         if (this.path === 2 && this.level >= 3) { setTimeout(() => projectiles.push(new Projectile(this.x, this.y, target, this.type, dmg, this.projectileSpeed, this)), 5); setTimeout(() => projectiles.push(new Projectile(this.x, this.y, target, this.type, dmg, this.projectileSpeed, this)), 10); }
     }
     if (this.type === 'mortar') {
         if (this.path === 1 && this.level >= 1) p.explosionRadius *= 1.5;
-        if (this.path === 1 && this.level >= 3) p.damage *= 5; 
-        if (this.path === 2 && this.level >= 5) p.explosionRadius = 1000; 
+            if (this.path === 1 && this.level >= 3) p.damage *= 2.8; 
+            if (this.path === 2 && this.level >= 5) p.explosionRadius = 250; 
     }
     projectiles.push(p);
 }
 onWaveEnd() {
     if (this.type === 'miner') {
-        let gain = 15; gain += this.level * 10; 
-        if (this.path === 1 && this.level >= 1) gain += 10; if (this.path === 1 && this.level >= 4) gain += 150;
-        if (this.path === 2 && this.level >= 2) gain += 40; if (this.path === 2 && this.level >= 3) gain += 100; if (this.path === 2 && this.level >= 4) gain *= 2; 
-        if (this.path === 1 && this.level >= 3) gain += Math.floor(gameState.money * 0.1);
-        if (this.path === 1 && this.level >= 5) gain += Math.floor(gameState.money * 0.2); 
+        let gain = 12; gain += this.level * 6; 
+        if (this.path === 1 && this.level >= 1) gain += 8; if (this.path === 1 && this.level >= 4) gain += 60;
+        if (this.path === 2 && this.level >= 2) gain += 25; if (this.path === 2 && this.level >= 3) gain += 60; if (this.path === 2 && this.level >= 4) gain = Math.floor(gain * 1.4); 
+        if (this.path === 1 && this.level >= 3) gain += Math.floor(gameState.money * 0.04);
+        if (this.path === 1 && this.level >= 5) gain += Math.floor(gameState.money * 0.06); 
         gameState.money += gain;
         particles.push(new Particle(this.x, this.y, '#ffd700', 5, 40));
     }
@@ -1050,7 +1056,7 @@ function updateUpgradeMenu() {
     document.getElementById('dps-display').innerText = "Total Dmg: " + Math.floor(selectedTower.totalDamage);
     
     const info = TOWER_TYPES[selectedTower.type];
-    let sellCost = info.cost * 0.7;
+    let sellCost = (selectedTower.invested || info.cost) * 0.7;
     document.getElementById('sell-value').innerText = Math.floor(sellCost);
 
     const btn = document.getElementById('priority-btn');
@@ -1129,14 +1135,18 @@ function updateUpgradeMenu() {
 
 function buyUpgrade(pathIdx) {
 if (!selectedTower) return;
+if (selectedTower.level >= 5) return;
+if (selectedTower.path !== 0 && selectedTower.path !== pathIdx) return;
 const info = TOWER_TYPES[selectedTower.type];
 const upgradeList = pathIdx === 1 ? info.upgrades.path1 : info.upgrades.path2;
 const upgrade = upgradeList[selectedTower.level]; 
+if (!upgrade) return;
 const discountMult = selectedTower.buffCostMultiplier || 1.0;
 const finalCost = Math.floor(upgrade.cost * discountMult);
 
 if (gameState.money >= finalCost) {
     gameState.money -= finalCost;
+    selectedTower.invested += finalCost;
     selectedTower.path = pathIdx;
     selectedTower.level++;
     if (selectedTower.type === 'sentry' && pathIdx === 1) selectedTower.cooldownMax *= 0.8;
@@ -1147,7 +1157,8 @@ if (gameState.money >= finalCost) {
 
 function sellSelectedTower() {
 if (!selectedTower) return;
-gameState.money += Math.floor(TOWER_TYPES[selectedTower.type].cost * 0.7); 
+const sellValue = Math.floor((selectedTower.invested || TOWER_TYPES[selectedTower.type].cost) * 0.7);
+gameState.money += sellValue; 
 const idx = towers.indexOf(selectedTower);
 if (idx > -1) towers.splice(idx, 1);
 selectedTower = null; updateUI(); updateUpgradeMenu();
@@ -1215,14 +1226,13 @@ gameState.endless = true;
 startNextWave();
 }
 
-canvas.addEventListener('mousemove', (e) => {
-const rect = canvas.getBoundingClientRect(); mousePos.x = e.clientX - rect.left; mousePos.y = e.clientY - rect.top;
-});
-
 canvas.addEventListener('mousedown', (e) => {
 if (gameState.gameOver) return;
 const rect = canvas.getBoundingClientRect();
-const mouseX = e.clientX - rect.left; const mouseY = e.clientY - rect.top;
+const scaleX = canvas.width / rect.width;
+const scaleY = canvas.height / rect.height;
+const mouseX = (e.clientX - rect.left) * scaleX;
+const mouseY = (e.clientY - rect.top) * scaleY;
 
 if (gameState.activeAbility) {
     useActiveAbility(mouseX, mouseY);
